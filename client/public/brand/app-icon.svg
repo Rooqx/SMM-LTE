@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">Rasm</title>
+  <rect width="512" height="512" fill="#c8ff4d"/>
+  <path fill="#090b12" d="M256 76 297 215 436 256 297 297 256 436 215 297 76 256 215 215Z"/>
+  <path fill="#090b12" d="m396 74 13 43 43 13-43 13-13 43-13-43-43-13 43-13Z"/>
+  <path fill="#090b12" d="m112 344 11 35 35 11-35 11-11 35-11-35-35-11 35-11Z"/>
+</svg>

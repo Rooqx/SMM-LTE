@@ -1,0 +1,12 @@
+node_modules/
+.pnpm-store/
+dist/
+.astro/
+.env
+.env.*
+!.env.example
+.dev.vars*
+.wrangler/
+playwright-report/
+test-results/
+coverage/

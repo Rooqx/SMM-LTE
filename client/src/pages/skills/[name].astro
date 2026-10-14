@@ -1,0 +1,7 @@
+---
+// Skill selection is a backend orchestration concern. Keep old bookmarks safe,
+// but never expose the retired raw-run interface to an authenticated browser.
+const destination = new URL("/", Astro.url);
+destination.search = Astro.url.search;
+return Astro.redirect(`${destination.pathname}${destination.search}`, 303);
+---

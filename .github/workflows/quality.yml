@@ -1,0 +1,50 @@
+name: Quality
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  backend-and-client:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.15.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: backend/.node-version
+          cache: pnpm
+          cache-dependency-path: |
+            backend/pnpm-lock.yaml
+            client/pnpm-lock.yaml
+      - name: Backend install
+        working-directory: backend
+        run: pnpm install --frozen-lockfile
+      - name: Backend quality
+        working-directory: backend
+        run: |
+          pnpm run skills:audit
+          pnpm run typecheck
+          pnpm test
+          pnpm run eval:release
+          pnpm run build
+          pnpm audit --audit-level high
+          pnpm run security:scan
+      - name: Client install
+        working-directory: client
+        run: pnpm install --frozen-lockfile
+      - name: Client quality
+        working-directory: client
+        run: |
+          pnpm run lint
+          pnpm run check
+          pnpm test
+          pnpm run build
+          pnpm audit --audit-level high

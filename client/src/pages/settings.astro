@@ -1,0 +1,5 @@
+---
+const destination = new URL("/you", Astro.url);
+destination.search = Astro.url.search;
+return Astro.redirect(`${destination.pathname}${destination.search}`, 303);
+---

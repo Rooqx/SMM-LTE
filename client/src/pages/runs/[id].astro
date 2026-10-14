@@ -1,0 +1,6 @@
+---
+import { RunEntry } from "@/components/entries/RunEntry";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+const id = Astro.params.id ?? "";
+---
+<BaseLayout title="Run detail"><RunEntry client:load runId={id} /></BaseLayout>

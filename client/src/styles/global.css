@@ -1,0 +1,223 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", "Avenir Next", "Segoe UI", sans-serif;
+  --font-display: "Inter", "Avenir Next", "Segoe UI", sans-serif;
+  --color-ink-950: #090b12;
+  --color-ink-900: #10131e;
+  --color-ink-800: #191d2a;
+  --color-acid-400: #c8ff4d;
+  --color-coral-400: #ff7d66;
+  --color-sky-400: #57d5ff;
+}
+
+:root {
+  color-scheme: dark;
+  font-family: var(--font-sans);
+  background: #090b12;
+  color: #f5f5ef;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-left: env(safe-area-inset-left, 0px);
+  --safe-area-inset-right: env(safe-area-inset-right, 0px);
+}
+
+* {
+  box-sizing: border-box;
+}
+html {
+  background: #090b12;
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+  scroll-padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
+}
+body {
+  min-width: 320px;
+  margin: 0;
+  background: #090b12;
+}
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid #c8ff4d;
+  outline-offset: 3px;
+  scroll-margin-block: 5rem;
+}
+::selection {
+  background: #c8ff4d;
+  color: #090b12;
+}
+
+.studio-bg {
+  background:
+    radial-gradient(
+      circle at 75% 0%,
+      rgba(87, 213, 255, 0.12),
+      transparent 30rem
+    ),
+    radial-gradient(
+      circle at 15% 40%,
+      rgba(200, 255, 77, 0.07),
+      transparent 28rem
+    ),
+    #090b12;
+}
+
+.grid-noise {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 34px 34px;
+}
+
+.panel {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(16, 19, 30, 0.96);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18);
+}
+
+.soft-panel {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.eyebrow {
+  font-size: 0.69rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #aab0c0;
+}
+
+.display-title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.text-gradient {
+  background: linear-gradient(105deg, #f7f7ef 5%, #c8ff4d 50%, #57d5ff 95%);
+  background-clip: text;
+  color: transparent;
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #363b4c transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.mobile-dock-clearance {
+  padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 768px) {
+  .mobile-dock-clearance {
+    padding-bottom: 2rem;
+  }
+}
+
+.touch-target-min {
+  min-height: 48px;
+  min-width: 48px;
+}
+
+.skip-link {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  z-index: 100;
+  transform: translateY(-200%);
+  border-radius: 0.75rem;
+  background: #c8ff4d;
+  color: #090b12;
+  padding: 0.75rem 1rem;
+  font-weight: 800;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.indeterminate-progress {
+  animation: smm-progress-shimmer 2s linear infinite;
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    rgba(200, 255, 77, 0.8),
+    transparent
+  );
+}
+
+.question-progress {
+  appearance: none;
+  border: 0;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.question-progress::-webkit-progress-bar {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.question-progress::-webkit-progress-value {
+  background: linear-gradient(90deg, #c8ff4d, #57d5ff);
+}
+
+.question-progress::-moz-progress-bar {
+  background: linear-gradient(90deg, #c8ff4d, #57d5ff);
+}
+
+@keyframes smm-progress-shimmer {
+  from {
+    transform: translateX(-160%);
+  }
+  to {
+    transform: translateX(360%);
+  }
+}
+
+@media (forced-colors: active) {
+  button,
+  a,
+  input,
+  textarea,
+  select,
+  .panel,
+  .soft-panel {
+    forced-color-adjust: auto;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 3px solid Highlight;
+  }
+}

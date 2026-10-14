@@ -1,0 +1,22 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "smm-orchestration-client",
+  "compatibility_date": "2026-10-14",
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./dist"
+  },
+  "observability": {
+    "enabled": true
+  },
+  "vars": {
+    "DEPLOY_TARGET": "cloudflare",
+    "SMM_API_AUDIENCE": "smm-orchestrator-api"
+  },
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "REPLACE_WITH_HYPERDRIVE_ID"
+    }
+  ]
+}

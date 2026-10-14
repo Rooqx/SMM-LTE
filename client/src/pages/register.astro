@@ -1,0 +1,14 @@
+---
+import AuthShell from "@/components/auth/AuthShell.astro";
+import { RegisterForm } from "@/components/auth/RegisterForm";
+import { UI_COPY } from "@/config/ui-copy";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { safeLocalPath } from "@/lib/utils";
+
+const nextPath = safeLocalPath(Astro.url.searchParams.get("next") ?? "/");
+---
+<BaseLayout title="Create account">
+  <AuthShell eyebrow="Secure registration" subtitle={UI_COPY.auth.registerSubtitle} title={UI_COPY.auth.registerTitle}>
+    <RegisterForm client:load nextPath={nextPath} />
+  </AuthShell>
+</BaseLayout>

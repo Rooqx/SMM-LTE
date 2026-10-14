@@ -1,0 +1,138 @@
+import { PRODUCT_CONFIG } from "./product";
+
+export const UI_COPY = {
+  auth: {
+    welcomeTitle: "Welcome back",
+    welcomeSubtitle:
+      "Open your workspace and let your autopilot social media manager handle the rest.",
+    emailLabel: "Work email",
+    passwordLabel: "Password",
+    signInAction: "Sign in to workspace",
+    googleSignInAction: "Continue with Google",
+    forgotPasswordAction: "Forgot password?",
+    invalidCredentialsError: "Sign-in failed. Check your details and try again.",
+    createAccountAction: "Create an account",
+    registerTitle: "Create your account",
+    registerSubtitle: "One secure owner account for your social media workspace.",
+    recoveryTitle: "Reset your password",
+    recoverySubtitle: "Enter your email and we’ll send a secure reset link if an account exists.",
+    recoveryConfirmation:
+      "If an account exists for that email, a password reset link has been sent.",
+    resetTitle: "Choose a new password",
+    resetSubtitle: "Use at least 6 characters and avoid reusing a password from another service.",
+    verificationConfirmation:
+      "Check your email to verify your account before signing in.",
+  },
+  shell: {
+    notificationsTitle: "Actions needed",
+    notificationsUnavailable:
+      "Decision alerts are not available yet. Today always shows the current action for this workspace.",
+    workspaceSwitcherLabel: "Select workspace",
+    createNewWorkspace: "Create workspace",
+    signOutAction: "Sign out",
+    userAccount: "Account settings",
+    betaBadge: "BETA",
+  },
+  common: {
+    loading: "Loading...",
+    errorTitle: "Something went wrong",
+    tryAgain: "Try again",
+    save: "Save changes",
+    cancel: "Cancel",
+    close: "Close",
+  },
+  library: {
+    eyebrow: "Creative inventory",
+    title: "Content Library",
+    subtitle:
+      "Everything your agent creates, organized and ready to use.",
+    tabs: {
+      fast: "Fast view",
+      folders: "Folders",
+      review: "Needs review",
+    },
+    fastView: {
+      spotlightTitle: "Next to publish",
+      spotlightSubtitle: "Latest approved post in current view",
+      searchPlaceholder: "Search posts, topics, or campaigns...",
+      allPlatforms: "All platforms",
+      allStatuses: "All statuses",
+      noResults: "No posts found matching the selected filters.",
+      loadMore: "Load more posts",
+      weeklyGlanceTitle: "Weekly overview",
+      weeklyGlanceSubtitle: "Distribution of ready posts",
+      copyGuidance: "Click any post card to copy its content to your clipboard.",
+    },
+    foldersView: {
+      sprintLabel: "Sprint",
+      weekLabel: "Week",
+      dayLabel: "Day",
+      noFolders: "No grouped post batches available yet.",
+      deliverablesTitle: "Strategy & deliverables",
+      noDeliverables: "No deliverable artifacts found.",
+    },
+    reviewView: {
+      title: "Deliverables awaiting review",
+      subtitle:
+        "Inspect generated strategy and brand foundations. Approve to continue, or request revisions.",
+      empty: "All caught up. No deliverables currently need review.",
+      approveAction: "Approve deliverable",
+      reviseAction: "Ask for changes",
+      rejectAction: "Reject",
+      instructionsLabel: "Revision instructions",
+      instructionsPlaceholder: "Describe exactly what you want adjusted...",
+      conflictAlert:
+        "This deliverable was updated by another session. We have refreshed the latest version.",
+    },
+    postCard: {
+      copyAction: "Copy text",
+      copiedAction: "Copied!",
+      lineageLabel: "Lineage",
+      runLabel: "Run",
+      revisionLabel: "Revision",
+      artifactLabel: "Source artifact",
+    },
+  },
+  brand: {
+    eyebrow: "Approved memory",
+    title: "Your Brand",
+    subtitle:
+      "The approved memory your agent uses automatically on every task.",
+    appliedAutomatically: "Applied automatically",
+    foundationActiveTitle: "Your approved foundation is active",
+    foundationActiveComplete: (count: number) =>
+      `${count} ${count === 1 ? "area is" : "areas are"} currently available to guide your content.`,
+    foundationActivePartial: (count: number) =>
+      `${count} ${count === 1 ? "area is" : "areas are"} loaded. More approved memory is available.`,
+    emptyTitle: "No approved brand memory yet",
+    emptyDescription:
+      "Complete the guided onboarding in Today. Approved answers will appear here automatically.",
+    startOnboarding: "Start brand onboarding",
+    memoryHeading: "Brand memory",
+    updatedAfterApproval: "Updated after approval",
+    loadMore: "Load more memory",
+    loadingMore: "Loading more memory…",
+    loadingMemory: "Loading approved brand memory",
+    versionHistory: "Version history",
+    hideVersionHistory: "Hide version history",
+    improveAction: "Improve this",
+    canonicalMemory: "Current canonical memory",
+    updateUnavailable: "Last update time is not exposed by the current API.",
+  },
+  account: {
+    eyebrow: "Account and workspace",
+    title: `You & ${PRODUCT_CONFIG.shortName}`,
+    subtitle: "Your account, workspace and everyday preferences.",
+    secureSession: "Secure session",
+    signInMethods: "Sign-in methods",
+    activeSessions: "Active sessions",
+    preferences: `${PRODUCT_CONFIG.shortName} preferences`,
+    preferencesDescription: `Choose how ${PRODUCT_CONFIG.shortName} behaves for this owner account.`,
+    workspaceTimezone: "Workspace timezone",
+    workspaceTimezoneDescription: "Used for calendar dates and local publishing times.",
+    exportTitle: "Obsidian export",
+    exportDescription: "Queue a one-way export of approved Brand memory and deliverables.",
+    exportQueued: "Export queued safely. Its live status appears below.",
+    signOut: "Sign out securely",
+  },
+} as const;

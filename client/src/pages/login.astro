@@ -1,0 +1,20 @@
+---
+import { LoginForm } from "@/components/auth/LoginForm";
+import AuthShell from "@/components/auth/AuthShell.astro";
+import { UI_COPY } from "@/config/ui-copy";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { safeLocalPath } from "@/lib/utils";
+
+const requestedNext = Astro.url.searchParams.get("next") ?? "/";
+const nextPath = safeLocalPath(requestedNext);
+---
+
+<BaseLayout title="Sign in">
+  <AuthShell
+    eyebrow="Private access"
+    subtitle={UI_COPY.auth.welcomeSubtitle}
+    title={UI_COPY.auth.welcomeTitle}
+  >
+    <LoginForm client:load nextPath={nextPath} />
+  </AuthShell>
+</BaseLayout>

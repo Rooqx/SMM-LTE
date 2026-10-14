@@ -1,0 +1,55 @@
+---
+import { PRODUCT_CONFIG } from "@/config/product";
+
+interface Props {
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+}
+
+const { eyebrow, title, subtitle } = Astro.props;
+---
+
+<main class="studio-bg grid-noise relative grid min-h-screen overflow-hidden lg:grid-cols-[1.15fr_.85fr]" id="main-content" tabindex="-1">
+  <section class="relative hidden min-h-screen border-r border-white/10 p-12 lg:flex lg:flex-col lg:justify-between">
+    <div class="flex items-center gap-3">
+      <span class="grid size-10 place-items-center rounded-xl bg-acid-400 font-black text-ink-950">
+        {PRODUCT_CONFIG.logo.textMark}
+      </span>
+      <span class="font-display text-sm font-bold uppercase tracking-[.18em]">
+        {PRODUCT_CONFIG.name}
+      </span>
+    </div>
+    <div class="max-w-2xl">
+      <p class="eyebrow mb-6">Autonomous SMM</p>
+      <p class="display-title text-gradient text-7xl xl:text-8xl">
+        Turn brand context into content people feel.
+      </p>
+      <p class="mt-8 max-w-xl text-lg leading-8 text-white/55">
+        {PRODUCT_CONFIG.tagline} One guided studio for brand voice, strategy,
+        platform-native production, and final post approval.
+      </p>
+    </div>
+    <div class="grid grid-cols-3 gap-3 text-sm text-white/45">
+      <div class="soft-panel rounded-2xl p-4"><strong class="block text-2xl text-white">06</strong>phases</div>
+      <div class="soft-panel rounded-2xl p-4"><strong class="block text-2xl text-white">100%</strong>owner control</div>
+      <div class="soft-panel rounded-2xl p-4"><strong class="block text-2xl text-white">24/7</strong>autopilot</div>
+    </div>
+  </section>
+  <section class="relative flex min-h-screen items-center justify-center p-6 sm:p-10">
+    <div class="panel w-full max-w-md rounded-[2rem] p-7 sm:p-10">
+      <div class="mb-8 flex items-center gap-3 lg:hidden">
+        <span class="grid size-10 place-items-center rounded-xl bg-acid-400 font-black text-ink-950">
+          {PRODUCT_CONFIG.logo.textMark}
+        </span>
+        <span class="font-display text-sm font-bold uppercase tracking-[.18em]">
+          {PRODUCT_CONFIG.name}
+        </span>
+      </div>
+      <p class="eyebrow">{eyebrow}</p>
+      <h1 class="display-title mt-4 text-4xl sm:text-5xl">{title}</h1>
+      <p class="mt-4 leading-7 text-white/50">{subtitle}</p>
+      <slot />
+    </div>
+  </section>
+</main>

@@ -1,0 +1,4 @@
+---
+const search = Astro.url.search;
+return Astro.redirect(`/${search}`, 303);
+---

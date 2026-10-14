@@ -1,0 +1,48 @@
+---
+import "@/styles/global.css";
+import { PRODUCT_CONFIG } from "@/config/product";
+import { SEO_CONFIG } from "@/config/seo";
+
+interface Props {
+  title?: string;
+  description?: string;
+  isPrivate?: boolean;
+}
+
+const {
+  title,
+  description = SEO_CONFIG.defaultDescription,
+  isPrivate = true,
+} = Astro.props;
+
+const pageTitle = title ? SEO_CONFIG.titleTemplate(title) : SEO_CONFIG.defaultTitle;
+const robotsDirective = isPrivate
+  ? SEO_CONFIG.robots.authenticated
+  : SEO_CONFIG.robots.public;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content={description} />
+    <meta name="robots" content={robotsDirective} />
+    <meta name="theme-color" content={SEO_CONFIG.themeColor} />
+    <meta name="application-name" content={PRODUCT_CONFIG.shortName} />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content={PRODUCT_CONFIG.shortName} />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/brand/app-icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/brand/apple-touch-icon.png" sizes="180x180" />
+    <title>{pageTitle}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <slot />
+    <!-- Registration is deliberately external so it remains tiny, static, and CSP-safe. -->
+    <script is:inline src="/register-sw.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,95 @@
+{
+  "project_name": "Social Media Manager Agent",
+  "current_phase": 5,
+  "current_phase_name": "REPURPOSING",
+  "status": "READY",
+  "last_updated": "2026-10-06",
+  "gates": {
+    "gate_1_brand_onboarding": "APPROVED",
+    "gate_2_weekly_topics": "APPROVED",
+    "gate_3_final_drafts": "APPROVED"
+  },
+  "active_sprint_week": "2026-W37",
+  "connected_platforms": {
+    "linkedin": true,
+    "twitter_x": true,
+    "instagram": false,
+    "facebook": false
+  },
+  "phase_ledger": {
+    "phase_1_discovery_and_onboarding": {
+      "status": "COMPLETED",
+      "gate": "gate_1_brand_onboarding",
+      "skills_actually_executed": [
+        "01-onboarding/voice-builder/SKILL.md",
+        "01-onboarding/profile-optimizer/SKILL.md"
+      ],
+      "reference_files_read": [
+        "01-onboarding/phase_1_discovery_and_onboarding.md",
+        ".agents/brand/voice.md",
+        ".agents/brand/audience.md",
+        ".agents/brand/positioning.md",
+        ".agents/brand/profile-funnels.md",
+        ".agents/social-media-context-sms.md"
+      ]
+    },
+    "phase_2_strategy_and_calendar": {
+      "status": "COMPLETED",
+      "gate": "gate_2_weekly_topics",
+      "skills_actually_executed": [
+        "02-strategy-and-calendar/content-matrix/SKILL.md",
+        "02-strategy-and-calendar/content-calendar-sms/SKILL.md",
+        "02-strategy-and-calendar/platform-strategy-sms/SKILL.md"
+      ],
+      "reference_files_read": [
+        "02-strategy-and-calendar/phase_2_strategy_matrix_and_calendar.md",
+        ".agents/strategy/content-matrix.md",
+        ".agents/calendar/current-sprint.md",
+        ".agents/brand/voice.md",
+        ".agents/brand/audience.md"
+      ]
+    },
+    "phase_3_creative_production": {
+      "status": "COMPLETED",
+      "skills_actually_executed": [
+        "03-creative-production/post-writer/SKILL.md"
+      ],
+      "skills_intentionally_omitted": [
+        "03-creative-production/video (not producing video content)",
+        "03-creative-production/reels-scripting (not producing TikTok/Reels)",
+        "03-creative-production/ad-creative (not running paid advertising campaigns)",
+        "03-creative-production/gemini-carousel (using Carbon code cards instead of multi-slide image decks)",
+        "03-creative-production/caption-writer-sms (only posting to LinkedIn and X)"
+      ],
+      "reference_files_read": [
+        "03-creative-production/phase_3_creative_production.md",
+        ".agents/brand/voice.md",
+        ".agents/calendar/current-sprint.md"
+      ]
+    },
+    "phase_4_qc_and_scoring": {
+      "status": "COMPLETED",
+      "gate": "gate_3_final_drafts",
+      "skills_actually_executed": [
+        "04-qc-and-scoring/post-scorer/SKILL.md",
+        "04-qc-and-scoring/copy-editing/SKILL.md"
+      ],
+      "reference_files_read": [
+        "04-qc-and-scoring/phase_4_qc_and_scoring.md",
+        "BRIDGE_CONFIG.md"
+      ]
+    },
+    "phase_5_repurposing": {
+      "status": "READY",
+      "gate": "repurposed_batch",
+      "skills_actually_executed": [],
+      "reference_files_read": []
+    },
+    "phase_6_analytics_and_feedback": {
+      "status": "NOT_STARTED",
+      "gate": "strategy_calibration",
+      "skills_actually_executed": [],
+      "reference_files_read": []
+    }
+  }
+}

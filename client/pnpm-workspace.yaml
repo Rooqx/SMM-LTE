@@ -1,0 +1,18 @@
+packages:
+  - "."
+
+# Keep pnpm's SQLite store inside the user-designated client boundary.
+storeDir: .pnpm-store
+
+# pnpm 11 blocks all lifecycle scripts unless they are explicitly trusted.
+allowBuilds:
+  esbuild: true
+  sharp: true
+  workerd: true
+
+minimumReleaseAgeExclude:
+  - "@astrojs/internal-helpers@0.12.0"
+  - "@astrojs/markdown-satteri@0.4.3"
+  - "@astrojs/cloudflare@14.3.4"
+  - "@astrojs/react@7.0.1"
+  - astro@7.3.6

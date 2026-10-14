@@ -1,0 +1,6 @@
+---
+const searchParams = new URLSearchParams(Astro.url.search);
+searchParams.set("view", "review");
+const query = searchParams.toString();
+return Astro.redirect(`/library${query ? `?${query}` : ""}`, 303);
+---

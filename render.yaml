@@ -1,0 +1,50 @@
+services:
+  - type: web
+    name: smm-orchestrator
+    runtime: node
+    plan: free
+    buildCommand: corepack enable && cd backend && pnpm install --frozen-lockfile && pnpm build
+    startCommand: node backend/scripts/start-render.mjs
+    healthCheckPath: /ready
+    maxShutdownDelaySeconds: 300
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_SSL
+        value: "true"
+      - key: DATABASE_SSL_REJECT_UNAUTHORIZED
+        value: "true"
+      - key: DATABASE_POOL_MAX
+        value: "3"
+      - key: WORKER_CONCURRENCY
+        value: "1"
+      - key: WORKER_MODEL_CONCURRENCY
+        value: "1"
+      - key: MAX_RUN_DURATION_MS
+        value: "240000"
+      - key: WORKER_SHUTDOWN_GRACE_MS
+        value: "270000"
+      - key: AUTH_JWKS_URL
+        sync: false
+      - key: AUTH_TOKEN_ISSUER
+        sync: false
+      - key: AUTH_TOKEN_AUDIENCE
+        value: smm-orchestrator-api
+      - key: METRICS_BEARER_TOKEN
+        sync: false
+      - key: EMAIL_PROVIDER
+        value: resend
+      - key: RESEND_API_KEY
+        sync: false
+      - key: AUTH_EMAIL_FROM
+        sync: false
+      - key: LLM_PROVIDER
+        value: openai
+      - key: OPENAI_API_KEY
+        sync: false
