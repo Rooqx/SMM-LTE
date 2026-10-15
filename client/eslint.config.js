@@ -35,6 +35,18 @@ export default [
     },
   },
   {
+    files: ["*.mjs", "scripts/**/*.mjs"],
+    languageOptions: {
+      globals: {
+        process: "readonly",
+        console: "readonly",
+        URL: "readonly",
+        setTimeout: "readonly",
+        clearTimeout: "readonly",
+      },
+    },
+  },
+  {
     ignores: [
       "dist/**",
       ".astro/**",
