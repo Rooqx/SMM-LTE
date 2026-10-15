@@ -40,12 +40,23 @@ export function createAssertionVerifier(
     },
   ),
 ): VerifyAssertion {
+  const allowedIssuers = Array.from(
+    new Set([
+      config.AUTH_TOKEN_ISSUER,
+      "http://localhost:4321",
+      "http://127.0.0.1:4321",
+      "http://172.20.10.3:4321",
+      ...(config.CORS_ORIGIN
+        ? config.CORS_ORIGIN.split(",").map((s) => s.trim()).filter(Boolean)
+        : []),
+    ]),
+  );
 
   return async (token) => {
     try {
       const { payload } = await jwtVerify(token, keyResolver, {
         algorithms: ["EdDSA"],
-        issuer: config.AUTH_TOKEN_ISSUER,
+        issuer: allowedIssuers,
         audience: config.AUTH_TOKEN_AUDIENCE,
         requiredClaims: ["sub", "iat", "exp", "iss", "aud"],
         maxTokenAge: config.AUTH_ASSERTION_MAX_AGE_SECONDS,
