@@ -637,8 +637,8 @@ export class Store {
     limit: number;
     kinds: readonly string[];
   }) {
-    if (!Number.isInteger(input.limit) || input.limit < 1 || input.limit > 20) {
-      throw new RangeError("Artifact tool limit must be between 1 and 20");
+    if (!Number.isInteger(input.limit) || input.limit < 1 || input.limit > 60) {
+      throw new RangeError("Artifact tool limit must be between 1 and 60");
     }
     if (input.kinds.length > 10) throw new RangeError("Artifact tool accepts at most 10 kinds");
     const result = await this.pool.query(

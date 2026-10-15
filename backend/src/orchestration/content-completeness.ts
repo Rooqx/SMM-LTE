@@ -3,7 +3,7 @@ import type { CalendarSlot } from "./calendar-slots.js";
 
 /** Run input is persisted JSON, so validate it again before trusting a slot plan. */
 export function readContentSlots(value: unknown): CalendarSlot[] {
-  if (!Array.isArray(value) || value.length === 0 || value.length > 15 ||
+  if (!Array.isArray(value) || value.length === 0 || value.length > 47 ||
       value.some((slot) => !slot || typeof slot !== "object" ||
         typeof slot.key !== "string" || !/^(cal|extra)-[a-f0-9]{32}-\d+$/.test(slot.key) ||
         typeof slot.localDate !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(slot.localDate) ||

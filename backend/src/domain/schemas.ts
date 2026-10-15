@@ -104,7 +104,7 @@ export const LlmActionSchema = z.discriminatedUnion("type", [
     type: z.literal("request_tool"),
     tool: z.literal("list_approved_artifacts"),
     arguments: z.object({
-      limit: z.number().int().min(1).max(20),
+      limit: z.number().int().min(1).max(60),
       kinds: z.array(z.string().min(1).max(80)).max(10),
     }).strict(),
   }).strict(),
@@ -116,14 +116,14 @@ export const LlmActionSchema = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("propose_output"),
     message: z.string().min(1).max(10_000),
-    artifacts: z.array(ArtifactDraftSchema).max(20),
+    artifacts: z.array(ArtifactDraftSchema).max(60),
     contextUpdates: z.array(ContextUpdateSchema).max(10),
     finalPosts: z.array(FinalPostDraftSchema).max(100).optional(),
   }).strict(),
   z.object({
     type: z.literal("request_approval"),
     message: z.string().min(1).max(10_000),
-    artifacts: z.array(ArtifactDraftSchema).max(20),
+    artifacts: z.array(ArtifactDraftSchema).max(60),
     contextUpdates: z.array(ContextUpdateSchema).max(10),
     finalPosts: z.array(FinalPostDraftSchema).max(100).optional(),
   }).strict(),
@@ -146,7 +146,7 @@ export type LlmAction = z.infer<typeof LlmActionSchema>;
 
 export const SkillExecutionResultSchema = z.object({
   message: z.string().max(10_000),
-  artifacts: z.array(ArtifactDraftSchema).max(20),
+  artifacts: z.array(ArtifactDraftSchema).max(60),
   context_updates: z.array(ContextUpdateSchema).max(10),
   final_posts: z.array(FinalPostDraftSchema).max(100).default([]),
   next_action: z.enum([

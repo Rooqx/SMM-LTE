@@ -1,6 +1,7 @@
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
 import type { FinalPost } from "@/lib/contracts";
+import { copyToClipboard } from "@/lib/utils";
 import { ContentContinuationPanel } from "./ContentContinuationPanel";
 import type { TodayController } from "./useTodayController";
 
@@ -15,15 +16,12 @@ export function TodayPostsView({ posts, isStartingContentCycle, onStartContentCy
   const [copyErrorId, setCopyErrorId] = useState<string | null>(null);
 
   async function handleCopy(post: FinalPost) {
-    try {
-      if (typeof navigator === "undefined" || !navigator.clipboard?.writeText) {
-        throw new Error("Clipboard unavailable");
-      }
-      await navigator.clipboard.writeText(post.content);
+    const ok = await copyToClipboard(post.content);
+    if (ok) {
       setCopyErrorId(null);
       setCopiedPostId(post.id);
       setTimeout(() => setCopiedPostId(null), 2500);
-    } catch {
+    } else {
       setCopiedPostId(null);
       setCopyErrorId(post.id);
     }
@@ -36,7 +34,11 @@ export function TodayPostsView({ posts, isStartingContentCycle, onStartContentCy
         <span className="text-acid-400 font-semibold">Copy & publish</span>
       </div>
 
-      <div className="grid gap-2">
+      <div
+        className="grid max-h-[520px] gap-2 overflow-y-auto rounded-2xl border border-white/10 bg-white/[.015] p-2 pr-1.5 focus:outline-none focus:ring-1 focus:ring-acid-400/40"
+        tabIndex={0}
+        aria-label="Posts ready to publish"
+      >
         {posts.map((post) => {
           const isCopied = copiedPostId === post.id;
           const copyFailed = copyErrorId === post.id;

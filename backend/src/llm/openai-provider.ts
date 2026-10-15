@@ -129,7 +129,7 @@ const actionVariants = [
         arguments: {
           type: "object",
           properties: {
-            limit: { type: "integer", minimum: 1, maximum: 20 },
+            limit: { type: "integer", minimum: 1, maximum: 60 },
             kinds: { type: "array", items: { type: "string" }, maxItems: 10 },
           },
           required: ["limit", "kinds"],
@@ -159,7 +159,7 @@ const actionVariants = [
       properties: {
         type: { type: "string", enum: ["propose_output"] },
         message: { type: "string", minLength: 1, maxLength: 10_000 },
-        artifacts: { type: "array", items: artifact, maxItems: 20 },
+        artifacts: { type: "array", items: artifact, maxItems: 60 },
         contextUpdates: { type: "array", items: contextUpdate, maxItems: 10 },
         finalPosts: { type: "array", items: finalPost, maxItems: 100 },
       },
@@ -171,7 +171,7 @@ const actionVariants = [
       properties: {
         type: { type: "string", enum: ["request_approval"] },
         message: { type: "string", minLength: 1, maxLength: 10_000 },
-        artifacts: { type: "array", items: artifact, maxItems: 20 },
+        artifacts: { type: "array", items: artifact, maxItems: 60 },
         contextUpdates: { type: "array", items: contextUpdate, maxItems: 10 },
         finalPosts: { type: "array", items: finalPost, maxItems: 100 },
       },
@@ -278,10 +278,33 @@ function isRecord(value: unknown): value is Record<string, unknown> {
  */
 function normalizeMetadataBags(value: unknown): unknown {
   if (!isRecord(value)) return value;
-  const action = value.action;
+
+  let root: Record<string, unknown> = value;
+  for (const wrapper of ["output", "data", "result", "response"]) {
+    if (!root.action && isRecord(root[wrapper]) && isRecord((root[wrapper] as Record<string, unknown>).action)) {
+      root = root[wrapper] as Record<string, unknown>;
+      break;
+    }
+  }
+
+  const action = root.action;
   if (!isRecord(action) ||
     (action.type !== "propose_output" && action.type !== "request_approval")) {
-    return value;
+    return root;
+  }
+
+  const normalizedAction: Record<string, unknown> = { ...action };
+  if (normalizedAction.context_updates) {
+    if (!normalizedAction.contextUpdates) {
+      normalizedAction.contextUpdates = normalizedAction.context_updates;
+    }
+    delete normalizedAction.context_updates;
+  }
+  if (normalizedAction.final_posts) {
+    if (!normalizedAction.finalPosts) {
+      normalizedAction.finalPosts = normalizedAction.final_posts;
+    }
+    delete normalizedAction.final_posts;
   }
 
   const normalizeItems = (
@@ -293,15 +316,61 @@ function normalizeMetadataBags(value: unknown): unknown {
       : item)
     : items;
 
+  const rawFinalPosts = Array.isArray(normalizedAction.finalPosts)
+    ? normalizedAction.finalPosts
+    : undefined;
+  const finalPosts = rawFinalPosts
+    ? rawFinalPosts.map((post) => {
+        if (!isRecord(post)) return post;
+        const p = { ...post };
+        if (p.logical_key) {
+          if (!p.logicalKey) p.logicalKey = p.logical_key;
+          delete p.logical_key;
+        }
+        if (p.local_date) {
+          if (!p.localDate) p.localDate = p.local_date;
+          delete p.local_date;
+        }
+        if (p.pinned_comment !== undefined) {
+          if (p.pinnedComment === undefined) p.pinnedComment = p.pinned_comment;
+          delete p.pinned_comment;
+        }
+        if (p.content_format) {
+          if (!p.format) p.format = p.content_format;
+          delete p.content_format;
+        }
+        if (typeof p.format === "string") {
+          p.format = p.format
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9_.-]+/g, "-")
+            .replace(/^-+|-+$/g, "")
+            .slice(0, 80) || "post";
+        }
+        if (typeof p.platform === "string") {
+          p.platform = p.platform
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9_.-]+/g, "-")
+            .replace(/^-+|-+$/g, "")
+            .slice(0, 40) || "social";
+        }
+        if (typeof p.week === "string") {
+          const parsedWeek = parseInt(p.week, 10);
+          if (!Number.isNaN(parsedWeek)) p.week = parsedWeek;
+        }
+        p.metadata = isRecord(p.metadata) ? p.metadata : {};
+        return p;
+      })
+    : undefined;
+
   return {
-    ...value,
+    ...root,
     action: {
-      ...action,
-      artifacts: normalizeItems(action.artifacts, "metadata"),
-      contextUpdates: normalizeItems(action.contextUpdates, "data"),
-      ...(Array.isArray(action.finalPosts)
-        ? { finalPosts: normalizeItems(action.finalPosts, "metadata") }
-        : {}),
+      ...normalizedAction,
+      artifacts: normalizeItems(normalizedAction.artifacts, "metadata"),
+      contextUpdates: normalizeItems(normalizedAction.contextUpdates, "data"),
+      ...(finalPosts ? { finalPosts } : {}),
     },
   };
 }
@@ -446,6 +515,12 @@ export class OpenAIProvider implements LlmProvider {
             },
           };
         } catch (error) {
+          console.log("[LLM_EXECUTE_ATTEMPT]", {
+            attempt: contentAttempt,
+            error: (error as Error).message,
+            finishReason: response.choices[0]?.finish_reason,
+            outputTextSnippet: outputText.slice(0, 400),
+          });
           if (!(error instanceof PermanentProviderError) || contentAttempt > 0) {
             throw error;
           }

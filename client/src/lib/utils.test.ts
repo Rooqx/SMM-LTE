@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
+  copyToClipboard,
   formatDate,
   formatDateOnly,
   markdownFilename,
@@ -46,3 +47,40 @@ describe("timezone-safe date formatting", () => {
     ).toContain("Oct 9, 2026");
   });
 });
+
+describe("copyToClipboard", () => {
+  it("uses navigator.clipboard.writeText when in secure context", async () => {
+    const writeTextMock = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(window, "isSecureContext", { value: true, configurable: true });
+    Object.assign(navigator, {
+      clipboard: { writeText: writeTextMock },
+    });
+
+    const result = await copyToClipboard("Hello world");
+    expect(result).toBe(true);
+    expect(writeTextMock).toHaveBeenCalledWith("Hello world");
+  });
+
+  it("falls back to document.execCommand when navigator.clipboard is absent", async () => {
+    Object.assign(navigator, { clipboard: undefined });
+    const execCommandMock = vi.fn().mockReturnValue(true);
+    document.execCommand = execCommandMock;
+
+    const result = await copyToClipboard("Fallback text");
+    expect(result).toBe(true);
+    expect(execCommandMock).toHaveBeenCalledWith("copy");
+  });
+
+  it("falls back to document.execCommand when navigator.clipboard.writeText rejects", async () => {
+    Object.assign(navigator, {
+      clipboard: { writeText: vi.fn().mockRejectedValue(new Error("Permission denied")) },
+    });
+    const execCommandMock = vi.fn().mockReturnValue(true);
+    document.execCommand = execCommandMock;
+
+    const result = await copyToClipboard("Fallback text on rejection");
+    expect(result).toBe(true);
+    expect(execCommandMock).toHaveBeenCalledWith("copy");
+  });
+});
+

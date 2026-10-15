@@ -133,7 +133,7 @@ export function ContentContinuationPanel({
               </fieldset>
               <div className="grid gap-3 sm:grid-cols-2">
                 <Field label="Number of posts">
-                  <input className={FIELD_CLASS} max={15} min={1} onChange={(event) => setQuantity(Number(event.target.value))} type="number" value={quantity} />
+                  <input className={FIELD_CLASS} max={47} min={1} onChange={(event) => setQuantity(Number(event.target.value))} type="number" value={quantity} />
                 </Field>
                 <Field label="Publication date">
                   <input className={FIELD_CLASS} min={today()} onChange={(event) => setPublicationDate(event.target.value)} type="date" value={publicationDate} />

@@ -1,7 +1,9 @@
 import {
   Archive,
+  Check,
   ChevronDown,
   ChevronRight,
+  Copy,
   FileText,
   Folder,
   FolderOpen,
@@ -9,7 +11,8 @@ import {
 } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import { UI_COPY } from "@/config/ui-copy";
-import type { Artifact, GroupedPostSprint } from "@/lib/contracts";
+import type { Artifact, FinalPost, GroupedPostSprint } from "@/lib/contracts";
+import { copyToClipboard } from "@/lib/utils";
 
 interface LibraryFoldersViewProps {
   groupedSprints?: GroupedPostSprint[] | undefined;
@@ -48,6 +51,32 @@ function FolderButton({
   );
 }
 
+function FolderPostCopyButton({ post }: { post: FinalPost }) {
+  const [state, setState] = useState<"idle" | "copied" | "failed">("idle");
+
+  async function copyPost() {
+    const ok = await copyToClipboard(post.content);
+    if (ok) {
+      setState("copied");
+      window.setTimeout(() => setState("idle"), 2_500);
+    } else {
+      setState("failed");
+    }
+  }
+
+  return (
+    <button
+      aria-label={`Copy post text for ${post.platform}`}
+      className="inline-flex min-h-[28px] items-center gap-1 rounded-md border border-white/10 bg-white/[.04] px-2 text-[9px] text-white/70 hover:bg-white/10 hover:text-white"
+      onClick={copyPost}
+      type="button"
+    >
+      {state === "copied" ? <Check aria-hidden className="size-3 text-acid-400" /> : <Copy aria-hidden className="size-3" />}
+      <span>{state === "copied" ? "Copied" : state === "failed" ? "Failed" : "Copy"}</span>
+    </button>
+  );
+}
+
 export function LibraryFoldersView({
   groupedSprints = [],
   artifacts = [],
@@ -59,6 +88,7 @@ export function LibraryFoldersView({
 }: LibraryFoldersViewProps) {
   const [openWeeks, setOpenWeeks] = useState<Record<string, boolean>>({ "0-0": true });
   const [openDays, setOpenDays] = useState<Record<string, boolean>>({ "0-0-0": true });
+  const [openPosts, setOpenPosts] = useState<Record<string, boolean>>({});
   const [deliverablesOpen, setDeliverablesOpen] = useState(true);
 
   return (
@@ -98,16 +128,48 @@ export function LibraryFoldersView({
                         </FolderButton>
                         {dayOpen ? (
                           <div className="ml-7 mt-2 grid gap-1.5">
-                            {day.posts.map((post) => (
-                              <article className="grid grid-cols-[28px_minmax(0,1fr)_auto] items-center gap-2 rounded-[10px] bg-white/[.045] px-2.5 py-2" key={post.id}>
-                                <FileText aria-hidden className="size-4 text-acid-400" />
-                                <span className="min-w-0">
-                                  <strong className="block truncate text-[9px] font-medium">{post.platform}.md</strong>
-                                  <span className="block truncate text-[8px] text-white/50">{post.content}</span>
-                                </span>
-                                <span className="text-[8px] capitalize text-white/42">{post.status}</span>
-                              </article>
-                            ))}
+                            {day.posts.map((post) => {
+                              const isOpen = Boolean(openPosts[post.id]);
+                              return (
+                                <article className="rounded-[10px] border border-white/10 bg-white/[.045] p-2.5 transition hover:border-white/20" key={post.id}>
+                                  <div className="flex items-center justify-between gap-2">
+                                    <button
+                                      type="button"
+                                      className="flex min-w-0 flex-1 items-center gap-2 text-left focus:outline-none"
+                                      onClick={() => setOpenPosts((current) => ({ ...current, [post.id]: !current[post.id] }))}
+                                      aria-expanded={isOpen}
+                                    >
+                                      <FileText aria-hidden className="size-4 shrink-0 text-acid-400" />
+                                      <span className="min-w-0">
+                                        <strong className="block truncate text-[9px] font-medium text-white hover:text-acid-400 transition">{post.platform}.md</strong>
+                                        <span className="block truncate text-[8px] text-white/50">{post.content}</span>
+                                      </span>
+                                    </button>
+                                    <div className="flex items-center gap-1.5 shrink-0">
+                                      <span className="text-[8px] capitalize text-white/42">{post.status}</span>
+                                      <button
+                                        type="button"
+                                        className="inline-flex min-h-[28px] items-center rounded-md border border-white/10 bg-white/[.04] px-2 text-[9px] text-white/70 hover:bg-white/10 hover:text-white"
+                                        onClick={() => setOpenPosts((current) => ({ ...current, [post.id]: !current[post.id] }))}
+                                      >
+                                        {isOpen ? "Close" : "Open"}
+                                      </button>
+                                      <FolderPostCopyButton post={post} />
+                                    </div>
+                                  </div>
+                                  {isOpen ? (
+                                    <div className="mt-2.5 border-t border-white/10 pt-2 text-[10px] leading-[1.55] text-white/75">
+                                      <p className="whitespace-pre-wrap">{post.content}</p>
+                                      {post.pinned_comment ? (
+                                        <div className="mt-2 rounded-lg bg-black/20 p-2 text-[9px] text-white/60">
+                                          <span className="font-semibold text-white/40">Pinned comment:</span> {post.pinned_comment}
+                                        </div>
+                                      ) : null}
+                                    </div>
+                                  ) : null}
+                                </article>
+                              );
+                            })}
                           </div>
                         ) : null}
                       </div>

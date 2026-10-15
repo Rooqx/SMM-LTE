@@ -64,7 +64,10 @@ export const ALL: APIRoute = async (context) => {
   headers.delete("x-forwarded-proto");
   try {
     const auth = await getRequestAuth(context);
-    const response = await auth.handler(new Request(context.request, { headers }));
+    let response = await auth.handler(new Request(context.request, { headers }));
+    if (response.status === 500 && context.request.method === "GET") {
+      response = await auth.handler(new Request(context.request, { headers }));
+    }
     return await safeBrowserResponse(response);
   } finally {
     await closeRequestAuth(context);

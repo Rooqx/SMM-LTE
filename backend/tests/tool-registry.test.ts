@@ -75,4 +75,34 @@ describe("read-only runtime tool registry", () => {
     expect(result.items).toHaveLength(1);
     expect(result.query).toEqual({ limit: 20, kinds: ["post-draft"] });
   });
+
+  it("loads 47 posts without truncation under expanded byte budget", async () => {
+    const listRecentApprovedArtifacts = vi.fn().mockResolvedValue(
+      Array.from({ length: 47 }, (_, index) => ({
+        id: `draft-${index}`,
+        kind: "post-draft",
+        slug: `draft-post-${index}`,
+        title: `Draft Post ${index}`,
+        content: "Here is a complete formatted post draft with plenty of text ".repeat(15),
+        metadata: { contentSlotKey: `cal-slot-${index}` },
+        version: 1,
+        created_at: new Date(0),
+      })),
+    );
+    const registry = new ToolRegistry(
+      { listRecentApprovedArtifacts } as unknown as Store,
+      120_000,
+    );
+
+    const result = await registry.loadApprovedArtifacts({
+      workspaceId: "workspace",
+      organizationId: "organization",
+      limit: 60,
+      kinds: ["post-draft"],
+    });
+
+    expect(result.items).toHaveLength(47);
+    expect(result.omitted).toBe(0);
+    expect(result.contentTruncated).toBe(false);
+  });
 });

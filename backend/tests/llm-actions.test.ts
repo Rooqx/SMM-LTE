@@ -221,4 +221,45 @@ describe("LLM runtime actions", () => {
       finalPosts: [{ ...(action as Extract<typeof action, { type: "request_approval" }>).finalPosts?.[0], localDate: "2026-02-30" }],
     })).toThrow(/real ISO calendar date/);
   });
+
+  it("normalizes human formats and snake_case keys in finalPosts", () => {
+    const envelope = parseActionEnvelope({
+      action: {
+        type: "propose_output",
+        message: "Formatted post batch",
+        artifacts: [{
+          kind: "final-post-batch",
+          slug: "batch-1",
+          title: "Batch 1",
+          content: "Done",
+        }],
+        context_updates: [],
+        final_posts: [{
+          logical_key: "cal-slot-1",
+          sprint: "Sprint 1",
+          week: "1",
+          local_date: "2026-10-19",
+          platform: "Instagram",
+          campaign: null,
+          topic: "Topic 1",
+          pillar: null,
+          format: "Meme / Image",
+          title: "Post 1",
+          content: "Valid post copy here.",
+          pinned_comment: null,
+        }],
+      },
+    });
+
+    expect(envelope.type).toBe("propose_output");
+    if (envelope.type === "propose_output") {
+      expect(envelope.finalPosts).toBeDefined();
+      expect(envelope.finalPosts?.[0]?.logicalKey).toBe("cal-slot-1");
+      expect(envelope.finalPosts?.[0]?.localDate).toBe("2026-10-19");
+      expect(envelope.finalPosts?.[0]?.platform).toBe("instagram");
+      expect(envelope.finalPosts?.[0]?.format).toBe("meme-image");
+      expect(envelope.finalPosts?.[0]?.week).toBe(1);
+    }
+  });
 });
+

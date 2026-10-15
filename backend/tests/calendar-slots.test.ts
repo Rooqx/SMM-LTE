@@ -53,7 +53,7 @@ describe("approved calendar worklist", () => {
       { key: "extra-123e4567e89b42d3a456426614174000-3", localDate: "2026-10-24",
         platform: "linkedin", topic: "A product update", format: "post" },
     ]);
-    expect(() => extraPostSlots(ID, { quantity: 16, platforms: ["x"],
+    expect(() => extraPostSlots(ID, { quantity: 48, platforms: ["x"],
       publicationDate: "2026-10-24", topic: "Idea" })).toThrow("valid quantity");
   });
 });

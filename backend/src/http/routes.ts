@@ -173,7 +173,7 @@ const ContentCycleBody = z.discriminatedUnion("mode", [
       (platforms) => new Set(platforms).size === platforms.length,
       "Platforms must not contain duplicates",
     ),
-    quantity: z.number().int().min(1).max(15),
+    quantity: z.number().int().min(1).max(47),
     publicationDate: IsoDate,
     instructions: z.string().trim().max(4_000).optional(),
     idempotencyKey: z.string().min(1).max(200),

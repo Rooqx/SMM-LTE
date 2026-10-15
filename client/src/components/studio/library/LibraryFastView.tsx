@@ -10,6 +10,7 @@ import {
 import { useMemo, useState } from "react";
 import { UI_COPY } from "@/config/ui-copy";
 import type { FinalPost } from "@/lib/contracts";
+import { copyToClipboard } from "@/lib/utils";
 
 interface LibraryFastViewProps {
   posts: FinalPost[];
@@ -71,12 +72,11 @@ function CopyPostButton({ className, post }: { className: string; post: FinalPos
   const [state, setState] = useState<"idle" | "copied" | "failed">("idle");
 
   async function copyPost() {
-    try {
-      if (!navigator.clipboard?.writeText) throw new Error("Clipboard unavailable");
-      await navigator.clipboard.writeText(post.content);
+    const ok = await copyToClipboard(post.content);
+    if (ok) {
       setState("copied");
       window.setTimeout(() => setState("idle"), 2_500);
-    } catch {
+    } else {
       setState("failed");
     }
   }
@@ -110,6 +110,7 @@ export function LibraryFastView({
   onSelectTab,
 }: LibraryFastViewProps) {
   const [spotlightOpen, setSpotlightOpen] = useState(false);
+  const [expandedPosts, setExpandedPosts] = useState<Record<string, boolean>>({});
   const filteredPosts = useMemo(() => posts.filter((post) => {
     if (selectedPlatform !== "all" && post.platform.toLowerCase() !== selectedPlatform) return false;
     if (selectedStatus !== "all" && post.status.toLowerCase() !== selectedStatus) return false;
@@ -186,23 +187,48 @@ export function LibraryFastView({
           </div>
           <div className="grid gap-2">
             {remainingPosts.map((post) => (
-              <article className="grid min-h-[58px] grid-cols-[36px_minmax(0,1fr)_auto] items-center gap-2.5 rounded-xl border border-white/10 bg-ink-900/80 p-2.5" key={post.id}>
-                <span className="grid size-[34px] place-items-center rounded-[10px] bg-white/[.055] text-acid-400"><PlatformIcon platform={post.platform} /></span>
-                <span className="min-w-0">
-                  <strong className="block truncate text-[10px] font-medium">{postHeadline(post)}</strong>
-                  <span className="block text-[9px] capitalize text-white/42">{post.title ?? `${post.local_date ?? "Upcoming"} · ${post.platform}`} · {post.status}</span>
-                </span>
-                {post.status === "draft" ? (
+              <article className="rounded-xl border border-white/10 bg-ink-900/80 p-2.5 transition hover:border-white/20" key={post.id}>
+                <div className="grid min-h-[46px] grid-cols-[36px_minmax(0,1fr)_auto] items-center gap-2.5">
+                  <span className="grid size-[34px] place-items-center rounded-[10px] bg-white/[.055] text-acid-400"><PlatformIcon platform={post.platform} /></span>
                   <button
-                    className="inline-flex min-h-[34px] items-center rounded-lg bg-white/[.055] px-2 text-[9px] hover:bg-white/10"
-                    onClick={() => onSelectTab?.("review")}
                     type="button"
+                    className="min-w-0 text-left focus:outline-none"
+                    onClick={() => setExpandedPosts((prev) => ({ ...prev, [post.id]: !prev[post.id] }))}
+                    aria-expanded={Boolean(expandedPosts[post.id])}
                   >
-                    Review
+                    <strong className="block truncate text-[10px] font-medium hover:text-acid-400 transition">{postHeadline(post)}</strong>
+                    <span className="block text-[9px] capitalize text-white/42">{post.title ?? `${post.local_date ?? "Upcoming"} · ${post.platform}`} · {post.status}</span>
                   </button>
-                ) : (
-                  <CopyPostButton className="inline-flex min-h-[34px] items-center gap-1 rounded-lg bg-white/[.055] px-2 text-[9px]" post={post} />
-                )}
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      className="inline-flex min-h-[34px] items-center rounded-lg border border-white/10 bg-white/[.04] px-2 text-[9px] text-white/70 hover:bg-white/10 hover:text-white"
+                      onClick={() => setExpandedPosts((prev) => ({ ...prev, [post.id]: !prev[post.id] }))}
+                    >
+                      {expandedPosts[post.id] ? "Close" : "Open"}
+                    </button>
+                    {post.status === "draft" ? (
+                      <button
+                        className="inline-flex min-h-[34px] items-center rounded-lg bg-white/[.055] px-2 text-[9px] hover:bg-white/10"
+                        onClick={() => onSelectTab?.("review")}
+                        type="button"
+                      >
+                        Review
+                      </button>
+                    ) : null}
+                    <CopyPostButton className="inline-flex min-h-[34px] items-center gap-1 rounded-lg bg-white/[.055] px-2 text-[9px]" post={post} />
+                  </div>
+                </div>
+                {expandedPosts[post.id] ? (
+                  <div className="mt-3 border-t border-white/10 pt-3 text-[10px] leading-[1.55] text-white/75">
+                    <p className="whitespace-pre-wrap">{post.content}</p>
+                    {post.pinned_comment ? (
+                      <div className="mt-2 rounded-lg bg-white/[.03] p-2 text-[9px] text-white/60">
+                        <span className="font-semibold text-white/40">Pinned comment:</span> {post.pinned_comment}
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
               </article>
             ))}
           </div>

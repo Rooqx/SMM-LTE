@@ -85,7 +85,16 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   try {
     const auth = await getRequestAuth(context);
-    const current = await auth.api.getSession({ headers: context.request.headers });
+    let current;
+    try {
+      current = await auth.api.getSession({ headers: context.request.headers });
+    } catch {
+      try {
+        current = await auth.api.getSession({ headers: context.request.headers });
+      } catch (retryError) {
+        console.warn("Session check failed after retry:", (retryError as Error)?.message || retryError);
+      }
+    }
     if (current?.user.emailVerified) {
       context.locals.user = current.user;
       context.locals.session = current.session;

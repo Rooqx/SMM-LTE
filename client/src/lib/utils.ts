@@ -106,3 +106,51 @@ export function safeRandomUUID(): string {
     return v.toString(16);
   });
 }
+
+/**
+ * Safely copies text to the clipboard across all environments.
+ * navigator.clipboard.writeText is only available in Secure Contexts (HTTPS/localhost);
+ * on local network HTTP (e.g. http://172.20.10.2:4321) navigator.clipboard is undefined
+ * or throws a SecurityError/NotAllowedError.
+ * This helper tries the async Clipboard API first, then falls back to document.execCommand('copy').
+ */
+export async function copyToClipboard(text: string): Promise<boolean> {
+  if (typeof window === "undefined") return false;
+
+  // Try modern Clipboard API first if present (works in secure contexts and in test mocks)
+  if (navigator?.clipboard && typeof navigator.clipboard.writeText === "function") {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      // If rejected (e.g. non-secure origin or document unfocused), fall through to execCommand
+    }
+  }
+
+  // Fallback for non-secure contexts (e.g. local IP HTTP) or unsupported environments
+  try {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.width = "2em";
+    textArea.style.height = "2em";
+    textArea.style.padding = "0";
+    textArea.style.border = "none";
+    textArea.style.outline = "none";
+    textArea.style.boxShadow = "none";
+    textArea.style.background = "transparent";
+    textArea.style.opacity = "0";
+    textArea.setAttribute("readonly", "");
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    const successful = document.execCommand("copy");
+    document.body.removeChild(textArea);
+    return successful;
+  } catch {
+    return false;
+  }
+}
+

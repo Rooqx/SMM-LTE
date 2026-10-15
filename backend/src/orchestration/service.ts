@@ -395,7 +395,7 @@ export class OrchestrationService {
       const requiredArtifacts = await this.tools.loadApprovedArtifacts({
         workspaceId: run.workspace_id,
         organizationId,
-        limit: 20,
+        limit: 60,
         kinds: requiredArtifactKinds,
       });
       if (run.phase === 4 && Array.isArray(run.input.content_slots)) {

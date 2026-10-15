@@ -2,6 +2,7 @@ import { Check, ChevronDown, ChevronUp, Copy, GitFork } from "lucide-react";
 import { useState } from "react";
 import { UI_COPY } from "@/config/ui-copy";
 import type { FinalPost } from "@/lib/contracts";
+import { copyToClipboard } from "@/lib/utils";
 
 interface LibraryPostCardProps {
   post: FinalPost;
@@ -28,15 +29,12 @@ export function LibraryPostCard({ post, highlight = false }: LibraryPostCardProp
   const [showLineage, setShowLineage] = useState(false);
 
   async function handleCopy() {
-    try {
-      if (typeof navigator === "undefined" || !navigator.clipboard?.writeText) {
-        throw new Error("Clipboard unavailable");
-      }
-      await navigator.clipboard.writeText(post.content);
+    const ok = await copyToClipboard(post.content);
+    if (ok) {
       setCopyFailed(false);
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
-    } catch {
+    } else {
       setCopied(false);
       setCopyFailed(true);
     }

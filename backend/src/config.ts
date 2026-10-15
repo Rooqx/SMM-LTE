@@ -85,7 +85,7 @@ const EnvironmentSchema = z.object({
   MAX_MODEL_TOKENS_PER_RUN: z.coerce.number().int().min(1_000).max(1_000_000).default(60_000),
   MAX_RUN_DURATION_MS: z.coerce.number().int().min(1_000).max(1_800_000).default(300_000),
   MAX_OPTIONAL_SKILL_DEPTH: z.coerce.number().int().min(0).max(2).default(1),
-  MAX_TOOL_RESULT_BYTES: z.coerce.number().int().min(1_000).max(180_000).default(30_000),
+  MAX_TOOL_RESULT_BYTES: z.coerce.number().int().min(1_000).max(180_000).default(120_000),
   MODEL_INPUT_COST_MICRO_USD_PER_MILLION: z.coerce.number().min(0).max(1_000_000_000).default(0),
   MODEL_OUTPUT_COST_MICRO_USD_PER_MILLION: z.coerce.number().min(0).max(1_000_000_000).default(0),
   OBSIDIAN_MAX_EXPORT_FILES: z.coerce.number().int().min(1).max(100_000).default(5_000),

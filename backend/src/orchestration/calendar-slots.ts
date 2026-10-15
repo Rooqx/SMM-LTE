@@ -84,9 +84,9 @@ export function parseCalendarSlots(calendarId: string, markdown: string): Calend
       topic,
       format: (columns.format >= 0 ? cells[columns.format] : undefined) || "post",
     });
-    // The QC steps load a bounded artifact snapshot (20 records). Leave room
+    // The QC steps load a bounded artifact snapshot (60 records). Leave room
     // for score/edit artifacts alongside every scheduled draft.
-    if (slots.length > 15) throw new Error("Calendar exceeds the 15-post batch limit");
+    if (slots.length > 47) throw new Error("Calendar exceeds the 47-post batch limit");
   }
   if (slots.length === 0) throw new Error("Calendar has no dated platform/topic rows");
   return slots;
@@ -98,7 +98,7 @@ export function extraPostSlots(briefRevisionId: string, brief: Record<string, un
   const platforms = brief.platforms;
   const date = brief.publicationDate;
   const topic = brief.topic;
-  if (!Number.isInteger(quantity) || Number(quantity) < 1 || Number(quantity) > 15 ||
+  if (!Number.isInteger(quantity) || Number(quantity) < 1 || Number(quantity) > 47 ||
       !Array.isArray(platforms) || platforms.length === 0 ||
       platforms.some((platform) => typeof platform !== "string" ||
         !/^[a-z0-9-]{1,40}$/.test(platform)) ||

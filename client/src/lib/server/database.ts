@@ -39,11 +39,43 @@ export async function createAuthPool(): Promise<pg.Pool> {
       application_name: "smm-auth-bff",
       statement_timeout: 15_000,
       query_timeout: 20_000,
-      connectionTimeoutMillis: 10_000,
-      idleTimeoutMillis: 30_000,
+      connectionTimeoutMillis: 5_000,
+      idleTimeoutMillis: 1_000,
+      keepAlive: true,
+      keepAliveInitialDelayMillis: 10_000,
       ...(config.DATABASE_SSL
         ? { ssl: { rejectUnauthorized: config.DATABASE_SSL_REJECT_UNAUTHORIZED } }
         : {}),
+    });
+
+    const originalConnect = devPool.connect.bind(devPool);
+    (devPool as any).connect = function (...args: any[]) {
+      if (typeof args[0] === "function") {
+        return (originalConnect as (...a: any[]) => any)(...args);
+      }
+      return (async () => {
+        let client = await originalConnect();
+        try {
+          await client.query("SELECT 1");
+          return client;
+        } catch (err) {
+          try {
+            client.release(err instanceof Error ? err : true);
+          } catch {
+            // ignore
+          }
+          return await originalConnect();
+        }
+      })();
+    };
+
+    devPool.on("connect", (client) => {
+      client.on("error", (error) => {
+        if ((error as { code?: string }).code === "57P01") return;
+        if (config.NODE_ENV !== "production") {
+          console.warn("Client socket notice:", error.message || error.name);
+        }
+      });
     });
 
     devPool.on("error", (error) => {
