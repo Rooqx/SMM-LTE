@@ -10,6 +10,8 @@ import type {
 import { studioQueryKeys } from "@/lib/query-keys";
 import { UI_COPY } from "@/config/ui-copy";
 import { ErrorState } from "@/components/ui/Feedback";
+import { LibrarySkeleton } from "@/components/ui/Skeletons";
+import { safeRandomUUID } from "@/lib/utils";
 import { LibraryFastView } from "./library/LibraryFastView";
 import { LibraryFoldersView } from "./library/LibraryFoldersView";
 import { LibraryHeader } from "./library/LibraryHeader";
@@ -266,9 +268,7 @@ export function LibraryPage({ workspace }: LibraryPageProps) {
       const idempotencyKey =
         revisionIntentRef.current?.signature === signature
           ? revisionIntentRef.current.key
-          : typeof crypto !== "undefined" && crypto.randomUUID
-            ? crypto.randomUUID()
-            : `rev-${Date.now()}`;
+          : safeRandomUUID();
       revisionIntentRef.current = { signature, key: idempotencyKey };
 
       return api.reviseRun(args.artifact.run_id, {
@@ -384,74 +384,97 @@ export function LibraryPage({ workspace }: LibraryPageProps) {
         />
       ) : null}
 
-      {!activeError && activeTab === "fast" && (
-        <LibraryFastView
-          hasNextPage={Boolean(finalPostsQuery.hasNextPage) && !reachedPostPageLimit}
-          isFetchingNextPage={finalPostsQuery.isFetchingNextPage}
-          isLoading={finalPostsQuery.isPending}
-          onLoadMore={() => void finalPostsQuery.fetchNextPage()}
-          pageLimitReached={reachedPostPageLimit}
-          onSearchChange={handleSearchChange}
-          onSelectPlatform={handleSelectPlatform}
-          onSelectStatus={handleSelectStatus}
-          posts={posts}
-          searchQuery={searchQuery}
-          selectedPlatform={selectedPlatform}
-          selectedStatus={selectedStatus}
-        />
-      )}
+      {!activeError &&
+        ((activeTab === "fast" && finalPostsQuery.isPending && posts.length === 0) ||
+          (activeTab === "folders" &&
+            (groupedPostsQuery.isPending || allArtifactsQuery.isPending) &&
+            groupedSprints.length === 0 &&
+            allArtifacts.length === 0) ||
+          (activeTab === "review" &&
+            draftArtifactsQuery.isPending &&
+            draftArtifacts.length === 0)) ? (
+        <div className="mt-4">
+          <LibrarySkeleton />
+        </div>
+      ) : null}
 
-      {!activeError && activeTab === "folders" && (
-        <LibraryFoldersView
-          artifacts={allArtifacts}
-          groupedSprints={groupedSprints}
-          hasMore={
-            (Boolean(groupedPostsQuery.hasNextPage) && !reachedGroupedPageLimit) ||
-            (Boolean(allArtifactsQuery.hasNextPage) && !reachedArtifactPageLimit)
-          }
-          isLoadingMore={
-            groupedPostsQuery.isFetchingNextPage ||
-            allArtifactsQuery.isFetchingNextPage
-          }
-          isLoading={groupedPostsQuery.isPending}
-          onLoadMore={() => {
-            if (groupedPostsQuery.hasNextPage && !reachedGroupedPageLimit) {
-              void groupedPostsQuery.fetchNextPage();
-            }
-            if (allArtifactsQuery.hasNextPage && !reachedArtifactPageLimit) {
-              void allArtifactsQuery.fetchNextPage();
-            }
-          }}
-          pageLimitReached={
-            reachedGroupedPageLimit || reachedArtifactPageLimit
-          }
-        />
-      )}
+      {!activeError &&
+        activeTab === "fast" &&
+        (!finalPostsQuery.isPending || posts.length > 0) && (
+          <LibraryFastView
+            hasNextPage={Boolean(finalPostsQuery.hasNextPage) && !reachedPostPageLimit}
+            isFetchingNextPage={finalPostsQuery.isFetchingNextPage}
+            isLoading={finalPostsQuery.isPending}
+            onLoadMore={() => void finalPostsQuery.fetchNextPage()}
+            pageLimitReached={reachedPostPageLimit}
+            onSearchChange={handleSearchChange}
+            onSelectPlatform={handleSelectPlatform}
+            onSelectStatus={handleSelectStatus}
+            onSelectTab={handleTabChange}
+            posts={posts}
+            searchQuery={searchQuery}
+            selectedPlatform={selectedPlatform}
+            selectedStatus={selectedStatus}
+          />
+        )}
 
-      {!activeError && activeTab === "review" && (
-        <LibraryReviewView
-          conflictError={conflictError}
-          actionError={decisionError}
-          draftArtifacts={draftArtifacts}
-          isDeciding={isDeciding}
-          isLoading={draftArtifactsQuery.isPending}
-          hasMore={Boolean(draftArtifactsQuery.hasNextPage) && !reachedDraftPageLimit}
-          isLoadingMore={draftArtifactsQuery.isFetchingNextPage}
-          onApprove={async (artifact) => {
-            await approveMutation.mutateAsync(artifact);
-          }}
-          onDismissConflict={() => setConflictError(null)}
-          onDismissActionError={() => setDecisionError(null)}
-          onLoadMore={() => void draftArtifactsQuery.fetchNextPage()}
-          onReject={async (artifact) => {
-            await rejectMutation.mutateAsync(artifact);
-          }}
-          onRevise={async (artifact, instructions) => {
-            await reviseMutation.mutateAsync({ artifact, instructions });
-          }}
-          pageLimitReached={reachedDraftPageLimit}
-        />
-      )}
+      {!activeError &&
+        activeTab === "folders" &&
+        (!groupedPostsQuery.isPending ||
+          groupedSprints.length > 0 ||
+          allArtifacts.length > 0) && (
+          <LibraryFoldersView
+            artifacts={allArtifacts}
+            groupedSprints={groupedSprints}
+            hasMore={
+              (Boolean(groupedPostsQuery.hasNextPage) && !reachedGroupedPageLimit) ||
+              (Boolean(allArtifactsQuery.hasNextPage) && !reachedArtifactPageLimit)
+            }
+            isLoadingMore={
+              groupedPostsQuery.isFetchingNextPage ||
+              allArtifactsQuery.isFetchingNextPage
+            }
+            isLoading={groupedPostsQuery.isPending}
+            onLoadMore={() => {
+              if (groupedPostsQuery.hasNextPage && !reachedGroupedPageLimit) {
+                void groupedPostsQuery.fetchNextPage();
+              }
+              if (allArtifactsQuery.hasNextPage && !reachedArtifactPageLimit) {
+                void allArtifactsQuery.fetchNextPage();
+              }
+            }}
+            pageLimitReached={
+              reachedGroupedPageLimit || reachedArtifactPageLimit
+            }
+          />
+        )}
+
+      {!activeError &&
+        activeTab === "review" &&
+        (!draftArtifactsQuery.isPending || draftArtifacts.length > 0) && (
+          <LibraryReviewView
+            conflictError={conflictError}
+            actionError={decisionError}
+            draftArtifacts={draftArtifacts}
+            isDeciding={isDeciding}
+            isLoading={draftArtifactsQuery.isPending}
+            hasMore={Boolean(draftArtifactsQuery.hasNextPage) && !reachedDraftPageLimit}
+            isLoadingMore={draftArtifactsQuery.isFetchingNextPage}
+            onApprove={async (artifact) => {
+              await approveMutation.mutateAsync(artifact);
+            }}
+            onDismissConflict={() => setConflictError(null)}
+            onDismissActionError={() => setDecisionError(null)}
+            onLoadMore={() => void draftArtifactsQuery.fetchNextPage()}
+            onReject={async (artifact) => {
+              await rejectMutation.mutateAsync(artifact);
+            }}
+            onRevise={async (artifact, instructions) => {
+              await reviseMutation.mutateAsync({ artifact, instructions });
+            }}
+            pageLimitReached={reachedDraftPageLimit}
+          />
+        )}
     </div>
   );
 }

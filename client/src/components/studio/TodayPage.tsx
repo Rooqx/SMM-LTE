@@ -1,5 +1,5 @@
 import { AlertTriangle, ArrowRight, RefreshCw, RotateCcw } from "lucide-react";
-import { LoadingState } from "@/components/ui/Feedback";
+import { TodaySkeleton } from "@/components/ui/Skeletons";
 import type { Workspace } from "@/lib/contracts";
 import type { TodayPresentationState } from "@/lib/today-selector";
 import { CreateWorkspace } from "./CreateWorkspace";
@@ -251,7 +251,7 @@ export function TodayPage({ workspace }: TodayPageProps) {
     return (
       <>
         <h1 className="sr-only">Today</h1>
-        <LoadingState label="Connecting to your autopilot orchestrator..." />
+        <TodaySkeleton />
       </>
     );
   }

@@ -3,6 +3,23 @@ import react from "@astrojs/react";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 
+if (typeof process !== "undefined" && process.on) {
+  process.on("uncaughtException", (error) => {
+    const isSocketTimeout =
+      error?.code === "ETIMEDOUT" ||
+      error?.code === "ECONNRESET" ||
+      error?.code === "EPIPE" ||
+      error?.name === "AggregateError" ||
+      String(error?.message).includes("ETIMEDOUT") ||
+      String(error?.message).includes("Connection terminated");
+    if (isSocketTimeout) {
+      console.warn("[Astro Dev Warning] Handled background socket timeout:", error.message || error.code);
+      return;
+    }
+    console.error("[Astro Dev Uncaught Exception]", error);
+  });
+}
+
 export default defineConfig({
   output: "server",
   session: false,

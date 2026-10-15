@@ -7,6 +7,7 @@ import { PRODUCT_CONFIG } from "@/config/product";
 import { api, ApiError } from "@/lib/api";
 import type { Workspace } from "@/lib/contracts";
 import { studioQueryKeys } from "@/lib/query-keys";
+import { safeRandomUUID } from "@/lib/utils";
 
 function formBoolean(data: FormData, name: string): boolean {
   return data.get(name) === "on";
@@ -14,7 +15,7 @@ function formBoolean(data: FormData, name: string): boolean {
 
 export function AccountWorkspacePanel({ workspace, userId }: { workspace: Workspace | undefined; userId: string }) {
   const queryClient = useQueryClient();
-  const exportKey = useRef(crypto.randomUUID());
+  const exportKey = useRef(safeRandomUUID());
   const workspaceTimezoneRef = useRef<HTMLInputElement>(null);
   const preferences = useQuery({ queryKey: studioQueryKeys.preferences(userId), queryFn: ({ signal }) => api.getPreferences({ signal }), enabled: Boolean(userId) });
   const savePreferences = useMutation({
@@ -41,7 +42,7 @@ export function AccountWorkspacePanel({ workspace, userId }: { workspace: Worksp
   });
   const exportJob = useMutation({
     mutationFn: () => api.enqueueObsidianExportJob(workspace!.id, exportKey.current),
-    onSuccess: () => { exportKey.current = crypto.randomUUID(); },
+    onSuccess: () => { exportKey.current = safeRandomUUID(); },
   });
   const exportStatus = useQuery({
     queryKey: studioQueryKeys.obsidianJob(exportJob.data?.id),

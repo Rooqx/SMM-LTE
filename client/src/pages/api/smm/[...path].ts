@@ -180,6 +180,9 @@ async function proxy(context: Parameters<APIRoute>[0]): Promise<Response> {
         502,
       );
     }
+    if (upstream.status >= 400) {
+      console.warn(`[SMM PROXY] ${method} /${path} upstream returned ${upstream.status}:`, responseBody.text);
+    }
     return new Response(responseBody.text || null, {
       status: upstream.status,
       headers: {

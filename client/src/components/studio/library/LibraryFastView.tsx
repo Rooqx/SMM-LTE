@@ -24,6 +24,7 @@ interface LibraryFastViewProps {
   onSelectStatus: (status: string) => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  onSelectTab?: ((tab: "fast" | "folders" | "review") => void) | undefined;
 }
 
 const PLATFORMS = [
@@ -106,6 +107,7 @@ export function LibraryFastView({
   onSelectStatus,
   searchQuery,
   onSearchChange,
+  onSelectTab,
 }: LibraryFastViewProps) {
   const [spotlightOpen, setSpotlightOpen] = useState(false);
   const filteredPosts = useMemo(() => posts.filter((post) => {
@@ -127,13 +129,6 @@ export function LibraryFastView({
 
   return (
     <div aria-labelledby="library-tab-fast" id="library-panel-fast" role="tabpanel">
-      {isLoading && posts.length === 0 ? (
-        <div aria-live="polite" className="flex items-center justify-center p-12 text-xs text-white/50" role="status">
-          <LoaderCircle aria-hidden className="mr-2 size-5 animate-spin" />
-          Loading social post inventory…
-        </div>
-      ) : null}
-
       {!isLoading && filteredPosts.length === 0 ? (
         <div className="rounded-[18px] border border-dashed border-white/10 bg-white/[.015] p-10 text-center">
           <Filter aria-hidden className="mx-auto mb-3 size-7 text-white/25" />
@@ -198,7 +193,13 @@ export function LibraryFastView({
                   <span className="block text-[9px] capitalize text-white/42">{post.title ?? `${post.local_date ?? "Upcoming"} · ${post.platform}`} · {post.status}</span>
                 </span>
                 {post.status === "draft" ? (
-                  <a className="inline-flex min-h-[34px] items-center rounded-lg bg-white/[.055] px-2 text-[9px]" href="?view=review">Review</a>
+                  <button
+                    className="inline-flex min-h-[34px] items-center rounded-lg bg-white/[.055] px-2 text-[9px] hover:bg-white/10"
+                    onClick={() => onSelectTab?.("review")}
+                    type="button"
+                  >
+                    Review
+                  </button>
                 ) : (
                   <CopyPostButton className="inline-flex min-h-[34px] items-center gap-1 rounded-lg bg-white/[.055] px-2 text-[9px]" post={post} />
                 )}

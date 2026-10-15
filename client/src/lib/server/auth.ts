@@ -38,7 +38,7 @@ export function createAuth(pool: pg.Pool) {
     database: {
       generateId: "uuid",
       joins: true,
-      validateSchema: true,
+      validateSchema: false,
     },
   },
   account: {

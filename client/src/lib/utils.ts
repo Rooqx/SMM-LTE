@@ -89,3 +89,20 @@ export function markdownFilename(value: string): string {
     .slice(0, 120);
   return `${safeStem || "artifact"}.md`;
 }
+
+/**
+ * Generates a RFC4122 v4 UUID safely across all environments.
+ * crypto.randomUUID is only available in Secure Contexts (HTTPS/localhost);
+ * on mobile devices connecting over local HTTP (e.g. 172.20.10.3), crypto.randomUUID
+ * is undefined and throws TypeError. This fallback provides a valid v4 UUID.
+ */
+export function safeRandomUUID(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}

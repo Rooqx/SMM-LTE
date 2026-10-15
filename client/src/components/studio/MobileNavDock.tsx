@@ -1,8 +1,10 @@
+import React from "react";
 import { PRIMARY_NAV_ITEMS } from "@/config/navigation";
 
 interface MobileNavDockProps {
   currentPath: string;
   workspaceId?: string | undefined;
+  onNavigate?: ((href: string) => void) | undefined;
 }
 
 function withWorkspace(href: string, workspaceId?: string): string {
@@ -11,7 +13,13 @@ function withWorkspace(href: string, workspaceId?: string): string {
   return `${href}${separator}workspace=${encodeURIComponent(workspaceId)}`;
 }
 
-export function MobileNavDock({ currentPath, workspaceId }: MobileNavDockProps) {
+export function MobileNavDock({ currentPath, workspaceId, onNavigate }: MobileNavDockProps) {
+  function handleNav(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    e.preventDefault();
+    onNavigate?.(href);
+  }
+
   return (
     <nav
       aria-label="Mobile Navigation"
@@ -31,6 +39,7 @@ export function MobileNavDock({ currentPath, workspaceId }: MobileNavDockProps) 
                   : "text-white/45 hover:text-white/80"
               }`}
               href={withWorkspace(href, workspaceId)}
+              onClick={(e) => handleNav(e, href)}
               key={href}
             >
               <Icon

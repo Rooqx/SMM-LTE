@@ -20,12 +20,12 @@ if (!localConnectionString) {
   process.exit(1);
 }
 
+const userArgs = process.argv.slice(2).filter((arg) => arg !== "--host");
 const child = spawn(path.join(clientRoot, "node_modules", ".bin", "astro"), [
   "dev",
   "--ignore-lock",
   "--host",
-  "0.0.0.0",
-  ...process.argv.slice(2),
+  ...userArgs,
 ], {
   cwd: clientRoot,
   env: { ...process.env, [hyperdriveLocalKey]: localConnectionString },

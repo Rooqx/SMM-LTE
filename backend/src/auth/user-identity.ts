@@ -52,7 +52,8 @@ export function createAssertionVerifier(
         clockTolerance: 5,
       });
       return AssertionClaims.parse(payload);
-    } catch {
+    } catch (err) {
+      console.error("[AUTH] JWT assertion verification failed:", err);
       throw unauthorized();
     }
   };
@@ -71,20 +72,25 @@ export class UserIdentityService {
 
   async authenticate(token: string): Promise<UserPrincipal> {
     if (token.length > 4_096) throw unauthorized();
-    const claims = await this.#verify(token);
-    const user = await this.#findAuthoritativeUser(claims);
-    const organizationId =
-      user.organization_id ?? (await this.#provisionPersonalAccount(claims));
+    try {
+      const claims = await this.#verify(token);
+      const user = await this.#findAuthoritativeUser(claims);
+      const organizationId =
+        user.organization_id ?? (await this.#provisionPersonalAccount(claims));
 
-    return {
-      kind: "user",
-      userId: user.user_id,
-      sessionId: user.session_id,
-      organizationId,
-      email: user.email,
-      name: user.name,
-      scopes: new Set(ALL_SCOPES),
-    };
+      return {
+        kind: "user",
+        userId: user.user_id,
+        sessionId: user.session_id,
+        organizationId,
+        email: user.email,
+        name: user.name,
+        scopes: new Set(ALL_SCOPES),
+      };
+    } catch (err) {
+      console.error("[AUTH] User authentication failed:", err);
+      throw unauthorized();
+    }
   }
 
   async #findAuthoritativeUser(claims: VerifiedClaims): Promise<AuthenticatedUserRow> {

@@ -8,7 +8,7 @@ import {
   selectTodayState,
   type TodayPresentationState,
 } from "@/lib/today-selector";
-import { isRunActive } from "@/lib/utils";
+import { isRunActive, safeRandomUUID } from "@/lib/utils";
 
 export interface TodayController {
   actionError: string | null;
@@ -48,10 +48,7 @@ export interface TodayController {
 }
 
 function generateIdempotencyKey(): string {
-  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
-    return crypto.randomUUID();
-  }
-  return `key_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  return safeRandomUUID();
 }
 
 function shouldRetainIdempotencyKey(error: unknown): boolean {

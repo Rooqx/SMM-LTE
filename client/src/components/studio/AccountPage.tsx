@@ -2,7 +2,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { LogOut } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
-import { ErrorState, LoadingState } from "@/components/ui/Feedback";
+import { ErrorState } from "@/components/ui/Feedback";
+import { AccountSkeleton } from "@/components/ui/Skeletons";
 import { UI_COPY } from "@/config/ui-copy";
 import { authClient, useSession } from "@/lib/auth-client";
 import type { Workspace } from "@/lib/contracts";
@@ -93,7 +94,7 @@ export function AccountPage({
     return (
       <>
         <h1 className="sr-only">{UI_COPY.account.title}</h1>
-        <LoadingState label="Loading your secure account…" />
+        <AccountSkeleton />
       </>
     );
   }

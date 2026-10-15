@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { getRequestAuth } from "@/lib/server/request-auth";
+import { closeRequestAuth, getRequestAuth } from "@/lib/server/request-auth";
 
 const SENSITIVE_RESPONSE_FIELDS = new Set([
   "token",
@@ -62,7 +62,11 @@ export const ALL: APIRoute = async (context) => {
   headers.set("x-forwarded-for", clientAddress || "0.0.0.0");
   headers.delete("x-forwarded-host");
   headers.delete("x-forwarded-proto");
-  const auth = await getRequestAuth(context);
-  const response = await auth.handler(new Request(context.request, { headers }));
-  return safeBrowserResponse(response);
+  try {
+    const auth = await getRequestAuth(context);
+    const response = await auth.handler(new Request(context.request, { headers }));
+    return await safeBrowserResponse(response);
+  } finally {
+    await closeRequestAuth(context);
+  }
 };

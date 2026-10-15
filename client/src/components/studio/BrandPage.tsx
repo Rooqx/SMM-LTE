@@ -6,7 +6,8 @@ import { buildBrandAreas } from "@/lib/brand-presenter";
 import type { ContextItem, Workspace } from "@/lib/contracts";
 import { buttonStyles } from "@/components/ui/Button";
 import { studioQueryKeys } from "@/lib/query-keys";
-import { EmptyState, ErrorState, LoadingState } from "@/components/ui/Feedback";
+import { EmptyState, ErrorState } from "@/components/ui/Feedback";
+import { BrandSkeleton } from "@/components/ui/Skeletons";
 import { UI_COPY } from "@/config/ui-copy";
 import { BrandAreaList } from "./brand/BrandAreaList";
 import { BrandDetail } from "./brand/BrandDetail";
@@ -79,7 +80,7 @@ export function BrandPage({ workspace }: { workspace?: Workspace | undefined }) 
     return (
       <>
         <h1 className="sr-only">{UI_COPY.brand.title}</h1>
-        <LoadingState label={UI_COPY.brand.loadingMemory} />
+        <BrandSkeleton />
       </>
     );
   }
