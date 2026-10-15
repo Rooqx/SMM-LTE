@@ -9,7 +9,7 @@
   },
   "scripts": {
     "generate:pwa-icons": "node ./scripts/generate-pwa-icons.mjs",
-    "dev": "astro dev",
+    "dev": "node ./scripts/dev.mjs",
     "build": "astro check && astro build",
     "preview": "astro preview",
     "deploy": "node scripts/check-deploy-config.mjs && pnpm build && wrangler deploy",

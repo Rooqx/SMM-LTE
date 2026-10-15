@@ -47,9 +47,10 @@ single public frontend origin; if Google login is used, register
 
 Run `pnpm build`, `pnpm exec wrangler deploy --dry-run`, then deploy from the
 `client/` directory with `pnpm deploy` after the checks below pass. The deploy
-script rejects the placeholder Hyperdrive ID. For a local Cloudflare runtime
-test, set `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE` to a test
-database URL and use `pnpm exec wrangler dev`. Never put a database password in
+script rejects the placeholder Hyperdrive ID. For local development, `pnpm dev`
+reads `DATABASE_URL` from `client/.env` as the Hyperdrive local connection
+string. Override it with `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE`
+when testing with a separate database. Never put a database password in
 `wrangler.jsonc` or commit `.dev.vars`.
 
 ## 3. Configure Render

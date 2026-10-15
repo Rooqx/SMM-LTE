@@ -15,6 +15,11 @@ pnpm dev
 
 Open `http://localhost:4321`. Set a unique `BETTER_AUTH_SECRET` of at least 32 characters and point `DATABASE_URL` at the same PostgreSQL database used by Fastify. Do not prefix secrets with `PUBLIC_`.
 
+`pnpm dev` uses `DATABASE_URL` from `client/.env` as Cloudflare Hyperdrive's
+local connection string. You can override it with
+`CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE`. Astro runs in the
+foreground so startup errors remain visible.
+
 The Astro server exposes Better Auth under `/api/auth/*`. It exchanges a verified HttpOnly session for a short-lived assertion when calling Fastify; no service key or assertion is stored in browser storage. Google sign-in is enabled only when both Google credentials are configured.
 
 The existing visual login/logout controls have intentionally not been migrated as part of the backend milestone. The server endpoints are ready; wire those controls only in the separate frontend implementation task.
