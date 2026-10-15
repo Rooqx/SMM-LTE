@@ -23,6 +23,8 @@ if (!localConnectionString) {
 const child = spawn(path.join(clientRoot, "node_modules", ".bin", "astro"), [
   "dev",
   "--ignore-lock",
+  "--host",
+  "0.0.0.0",
   ...process.argv.slice(2),
 ], {
   cwd: clientRoot,
