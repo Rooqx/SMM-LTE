@@ -131,7 +131,7 @@ export class PromptCompiler {
       ...(args.step.key === "build-sprint-calendar"
         ? [
             "# Calendar output contract",
-            "The content-calendar artifact must include a 'Week of Month DD, YYYY' heading and a Markdown table with Day, Platform, Topic / Angle, and Format columns. Plan at most 47 dated posts for the week across all platforms. Each dated row is a promised post. Put flexible ideas in separate Open rows, never as dated posts.",
+            "The content-calendar artifact must include a 'Week of Month DD, YYYY' heading and a Markdown table with Day, Platform, Topic / Angle, and Format columns. Plan at most 47 dated posts for the week across all platforms. Each dated row is a promised post. In the Day column, use full weekday names (e.g. Monday, Tuesday). Put flexible ideas in separate Open rows, never as dated posts. Keep each topic concise (under 200 characters).",
           ]
         : []),
       ...(args.step.key === "write-platform-posts"

@@ -56,4 +56,48 @@ describe("approved calendar worklist", () => {
     expect(() => extraPostSlots(ID, { quantity: 48, platforms: ["x"],
       publicationDate: "2026-10-24", topic: "Idea" })).toThrow("valid quantity");
   });
+
+  it("resiliently parses weekday abbreviations, varied headers, and formatted text", () => {
+    const markdown = `# Sprint Calendar
+**Week Starting**: Monday, October 19, 2026
+
+| **Day / Date** | **Channels** | **Content Angle** | **Asset Style** |
+| :--- | :--- | :--- | :--- |
+| Mon | Threads | Growth tip for developers | Thread |
+| Tue | YouTube | Product walkthrough video | Longform |
+| Wed | Bluesky | Quick industry reflection | Short |
+| Thu | LinkedIn | Deep dive on team alignment | Carousel |
+| [Flexible] | X | Reactive community answer | Post |`;
+
+    const slots = parseCalendarSlots(ID, markdown);
+    expect(slots).toHaveLength(4);
+    expect(slots[0]).toEqual({
+      key: "cal-123e4567e89b42d3a456426614174000-1",
+      localDate: "2026-10-19",
+      platform: "threads",
+      topic: "Growth tip for developers",
+      format: "Thread",
+    });
+    expect(slots[1]).toEqual({
+      key: "cal-123e4567e89b42d3a456426614174000-2",
+      localDate: "2026-10-20",
+      platform: "youtube",
+      topic: "Product walkthrough video",
+      format: "Longform",
+    });
+    expect(slots[2]).toEqual({
+      key: "cal-123e4567e89b42d3a456426614174000-3",
+      localDate: "2026-10-21",
+      platform: "bluesky",
+      topic: "Quick industry reflection",
+      format: "Short",
+    });
+    expect(slots[3]).toEqual({
+      key: "cal-123e4567e89b42d3a456426614174000-4",
+      localDate: "2026-10-22",
+      platform: "linkedin",
+      topic: "Deep dive on team alignment",
+      format: "Carousel",
+    });
+  });
 });

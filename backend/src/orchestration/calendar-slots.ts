@@ -11,8 +11,13 @@ export type CalendarSlot = Readonly<{
 }>;
 
 const DAYS: Readonly<Record<string, number>> = {
-  monday: 0, tuesday: 1, wednesday: 2, thursday: 3, friday: 4,
-  saturday: 5, sunday: 6,
+  monday: 0, mon: 0,
+  tuesday: 1, tue: 1, tues: 1,
+  wednesday: 2, wed: 2,
+  thursday: 3, thu: 3, thur: 3, thurs: 3,
+  friday: 4, fri: 4,
+  saturday: 5, sat: 5,
+  sunday: 6, sun: 6,
 };
 
 function normalizedPlatform(value: string): string {
@@ -22,16 +27,29 @@ function normalizedPlatform(value: string): string {
   if (/\binstagram\b/.test(name)) return "instagram";
   if (/\bfacebook\b/.test(name)) return "facebook";
   if (/\btiktok\b/.test(name)) return "tiktok";
+  if (/\byoutube\b/.test(name)) return "youtube";
+  if (/\bthreads\b/.test(name)) return "threads";
+  if (/\bbluesky\b/.test(name)) return "bluesky";
   return name.replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40);
 }
 
+function parseDateAsUtc(value: string): Date | null {
+  const trimmed = value.trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+    const d = new Date(`${trimmed}T00:00:00.000Z`);
+    return Number.isNaN(d.getTime()) || d.toISOString().slice(0, 10) !== trimmed ? null : d;
+  }
+  const d = new Date(trimmed.includes("UTC") ? trimmed : `${trimmed} UTC`);
+  if (!Number.isNaN(d.getTime())) return d;
+  const fallback = new Date(trimmed);
+  return Number.isNaN(fallback.getTime()) ? null : fallback;
+}
+
 function calendarMonday(markdown: string): Date | null {
-  const match = /(?:week of|starting|start date|period)\s*[:* -]*\s*([a-z]+\s+\d{1,2},?\s+\d{4}|\d{4}-\d{2}-\d{2})/i.exec(markdown);
+  const match = /(?:week of|starting|start date|period|week starting|week)\s*[:* -]*\s*(?:(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday|mon|tue|wed|thu|fri|sat|sun)[,\s]+)?([a-z]+\s+\d{1,2},?\s+\d{4}|\d{4}-\d{2}-\d{2})/i.exec(markdown);
   if (!match) return null;
-  const parsed = new Date(match[1]!);
-  if (Number.isNaN(parsed.getTime()) ||
-      (/^\d{4}-\d{2}-\d{2}$/.test(match[1]!) &&
-        parsed.toISOString().slice(0, 10) !== match[1])) return null;
+  const parsed = parseDateAsUtc(match[1]!);
+  if (!parsed) return null;
   const monday = new Date(Date.UTC(parsed.getUTCFullYear(), parsed.getUTCMonth(), parsed.getUTCDate()));
   monday.setUTCDate(monday.getUTCDate() - (monday.getUTCDay() + 6) % 7);
   return monday;
@@ -46,37 +64,60 @@ export function parseCalendarSlots(calendarId: string, markdown: string): Calend
   for (const line of lines) {
     const cells = line.trim().replace(/^\||\|$/g, "").split("|").map((cell) => cell.trim());
     if (cells.every((cell) => /^:?-{2,}:?$/.test(cell))) continue;
-    const header = cells.map((cell) => cell.toLowerCase());
-    if (header.some((cell) => cell.startsWith("day")) && header.includes("platform") && header.some((cell) => cell.includes("topic"))) {
+    const header = cells.map((cell) => cell.toLowerCase().replace(/[*_`]/g, ""));
+    const dayIdx = header.findIndex((cell) => /\b(day|date|weekday|when)\b/i.test(cell));
+    const platformIdx = header.findIndex((cell) => /\b(platform|platforms|channel|channels|network|networks|social)\b/i.test(cell));
+    const topicIdx = header.findIndex((cell) => /\b(topic|angle|theme|content|post|concept|hook|idea|subject|description|title)\b/i.test(cell));
+    if (dayIdx !== -1 && platformIdx !== -1 && topicIdx !== -1) {
       columns = {
-        day: header.findIndex((cell) => cell.startsWith("day")),
-        platform: header.indexOf("platform"),
-        topic: header.findIndex((cell) => cell.includes("topic")),
-        format: header.indexOf("format"),
+        day: dayIdx,
+        platform: platformIdx,
+        topic: topicIdx,
+        format: header.findIndex((cell) => /\b(format|type|media|asset|style)\b/i.test(cell)),
       };
       continue;
     }
     if (!columns) continue;
-    const dayCell = cells[columns.day] ?? "";
-    const dayName = dayCell.toLowerCase().match(/\b(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/)?.[1];
-    if (!dayName) continue;
-    const platform = normalizedPlatform(cells[columns.platform] ?? "");
-    const topic = cells[columns.topic]?.trim() ?? "";
-    if (!platform || !topic || topic.length > 240) {
-      throw new Error("Every dated calendar row needs a platform and a topic of at most 240 characters");
+    const dayCell = (cells[columns.day] ?? "").replace(/[*_`]/g, "");
+    if (/\b(open|flexible|tbd|buffer|reserve)\b/i.test(dayCell)) continue;
+
+    const dayNameMatch = dayCell.toLowerCase().match(/\b(monday|tuesday|wednesday|thursday|friday|saturday|sunday|mon|tue|tues|wed|thu|thur|thurs|fri|sat|sun)\b/)?.[1];
+    let dayOffset: number | null = null;
+    if (dayNameMatch && dayNameMatch in DAYS) {
+      dayOffset = DAYS[dayNameMatch]!;
     }
-    const date = new Date(monday);
-    date.setUTCDate(date.getUTCDate() + DAYS[dayName]!);
     const explicitDate = /\b\d{4}-\d{2}-\d{2}\b/.exec(dayCell)?.[0];
+    const date = new Date(monday);
     if (explicitDate) {
       const parsed = new Date(`${explicitDate}T00:00:00.000Z`);
       if (Number.isNaN(parsed.getTime()) ||
-          parsed.toISOString().slice(0, 10) !== explicitDate ||
-          parsed.getUTCDay() !== date.getUTCDay()) {
+          parsed.toISOString().slice(0, 10) !== explicitDate) {
         throw new Error("Calendar row date does not match its weekday");
       }
+      if (dayOffset !== null) {
+        const expectedDay = (parsed.getUTCDay() + 6) % 7;
+        if (expectedDay !== dayOffset) {
+          throw new Error("Calendar row date does not match its weekday");
+        }
+      } else {
+        dayOffset = (parsed.getUTCDay() + 6) % 7;
+      }
       date.setTime(parsed.getTime());
+    } else if (dayOffset !== null) {
+      date.setUTCDate(date.getUTCDate() + dayOffset);
+    } else {
+      continue;
     }
+
+    const platform = normalizedPlatform(cells[columns.platform] ?? "");
+    let topic = (cells[columns.topic] ?? "").replace(/^[*_`]+|[*_`]+$/g, "").trim();
+    if (!platform || !topic) {
+      throw new Error("Every dated calendar row needs a platform and a topic of at most 240 characters");
+    }
+    if (topic.length > 240) {
+      topic = topic.slice(0, 237).trim() + "...";
+    }
+
     slots.push({
       key: `cal-${calendarId.replaceAll("-", "")}-${slots.length + 1}`,
       localDate: date.toISOString().slice(0, 10),
