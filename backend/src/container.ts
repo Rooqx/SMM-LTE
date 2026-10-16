@@ -41,7 +41,7 @@ export type Container = {
   workflowStore: WorkflowStore;
   interviewStore: InterviewStore;
   interview: InterviewService;
-  optionAssistant: OptionAssistantService;
+  optionAssistant: OptionAssistantService | null;
   optionCache: InterviewOptionCache;
   queue: JobQueue;
   registry: SkillRegistry;
@@ -155,10 +155,11 @@ export async function buildContainer(overrides?: {
     config.OPTION_ASSISTANT_INPUT_COST_MICRO_USD_PER_MILLION,
     config.OPTION_ASSISTANT_OUTPUT_COST_MICRO_USD_PER_MILLION,
   );
+  // LLM option generation disabled: interview questions deterministically use curated fallback options.
   const interview = new InterviewService(
     interviewStore,
     performance,
-    optionAssistant,
+    undefined,
     config.GUIDED_INTAKE_ENABLED,
   );
 
@@ -172,7 +173,7 @@ export async function buildContainer(overrides?: {
     workflowStore,
     interviewStore,
     interview,
-    optionAssistant,
+    optionAssistant: null,
     optionCache,
     queue,
     registry,

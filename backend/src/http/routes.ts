@@ -543,17 +543,21 @@ export async function registerRoutes(app: FastifyInstance, container: Container)
     "/v1/workspaces/:workspaceId/interview/options/prefetch",
     { preHandler: [requireScope("workspaces:write"), requireUser] },
     async (request, reply) => {
-      const caller = principal(request);
-      const { workspaceId } = WorkspaceParams.parse(request.params);
-      const body = PrefetchOptionsBody.parse(request.body);
-      const queued = await container.optionAssistant.prefetchOptions({
-        organizationId: caller.organizationId,
-        workspaceId,
-        sessionId: body.sessionId,
-        questionnaireVersion: body.questionnaireVersion,
-        targetQuestionIds: body.targetQuestionIds,
-      });
-      await reply.code(202).send({ status: queued ? "queued" : "fallback" });
+      if (container.optionAssistant) {
+        const caller = principal(request);
+        const { workspaceId } = WorkspaceParams.parse(request.params);
+        const body = PrefetchOptionsBody.parse(request.body);
+        const queued = await container.optionAssistant.prefetchOptions({
+          organizationId: caller.organizationId,
+          workspaceId,
+          sessionId: body.sessionId,
+          questionnaireVersion: body.questionnaireVersion,
+          targetQuestionIds: body.targetQuestionIds,
+        });
+        await reply.code(202).send({ status: queued ? "queued" : "fallback" });
+        return;
+      }
+      await reply.code(202).send({ status: "fallback" });
     },
   );
 

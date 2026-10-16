@@ -242,7 +242,7 @@ export class Worker {
     }
     if (job.type === "generate_interview_options") {
       if (!this.optionAssistant) {
-        throw new PermanentJobError("Option assistant is not configured on this worker");
+        return;
       }
       await this.optionAssistant.processJob(job);
       return;
