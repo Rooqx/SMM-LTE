@@ -89,7 +89,7 @@ export function createAuth(pool: pg.Pool) {
   },
   rateLimit: {
     enabled: true,
-    storage: "database",
+    storage: "memory",
     window: 60,
     max: 100,
     customRules: {

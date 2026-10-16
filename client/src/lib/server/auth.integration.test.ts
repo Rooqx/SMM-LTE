@@ -15,7 +15,7 @@ integration("Better Auth PostgreSQL integration", () => {
   }) => Promise<Response>;
 
   beforeAll(async () => {
-    process.env.DATABASE_URL = databaseUrl;
+    if (databaseUrl) process.env.DATABASE_URL = databaseUrl;
     process.env.DATABASE_SSL = "false";
     process.env.NODE_ENV = "test";
     process.env.BETTER_AUTH_SECRET = "integration-only-secret-at-least-32-characters";
@@ -103,7 +103,7 @@ integration("Better Auth PostgreSQL integration", () => {
       request: sessionRequest,
       clientAddress: "127.0.0.1",
     });
-    expect((await publicSession.json()).session).not.toHaveProperty("token");
+    expect(((await publicSession.json()) as { session?: Record<string, unknown> }).session).not.toHaveProperty("token");
 
     const tokenResponse = await handler(authRequest("/token", undefined, sessionCookie));
     expect(tokenResponse.status).toBe(200);

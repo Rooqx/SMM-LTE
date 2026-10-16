@@ -89,10 +89,12 @@ export async function createAuthPool(): Promise<pg.Pool> {
     return devPool;
   }
 
-  // Cloudflare Workers mode: Hyperdrive owns the pool, 1 connection per worker request
+  // Cloudflare Workers mode: Hyperdrive pools upstream, but the worker request pool
+  // needs sufficient capacity for concurrent operations (e.g. creating a user while
+  // enqueuing verification email in a background task). A max of 1 causes self-deadlocks.
   const pool = new Pool({
     connectionString: await connectionString(),
-    max: 1,
+    max: Math.max(config.DATABASE_POOL_MAX, 3),
     application_name: "smm-auth-bff",
     statement_timeout: 15_000,
     query_timeout: 20_000,

@@ -11,7 +11,9 @@
   },
   "vars": {
     "DEPLOY_TARGET": "cloudflare",
-    "SMM_API_AUDIENCE": "smm-orchestrator-api"
+    "SMM_API_AUDIENCE": "smm-orchestrator-api",
+    "BETTER_AUTH_URL": "https://rasm.onrooqx.com",
+    "AUTH_TRUSTED_ORIGINS": "https://rasm.onrooqx.com"
   },
   "hyperdrive": [
     {

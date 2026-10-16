@@ -52,7 +52,7 @@ function renderCreateWorkspace(onClose = vi.fn()) {
 describe("key interaction accessibility", () => {
   it("keeps the workspace dialog labelled, trapped, and dismissible", async () => {
     const before = document.createElement("button");
-    document.body.append(before);
+    document.body.appendChild(before);
     before.focus();
     const onClose = vi.fn();
     const { container, unmount } = renderCreateWorkspace(onClose);

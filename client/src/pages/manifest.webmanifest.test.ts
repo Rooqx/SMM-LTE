@@ -5,7 +5,7 @@ import { GET } from "./manifest.webmanifest";
 describe("web app manifest", () => {
   it("uses centralized product metadata and installable icon sizes", async () => {
     const response = await GET({} as never);
-    const manifest = await response.json();
+    const manifest = (await response.json()) as Record<string, unknown>;
 
     expect(response.headers.get("content-type")).toContain("application/manifest+json");
     expect(manifest.name).toBe(PRODUCT_CONFIG.name);
